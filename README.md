@@ -88,3 +88,5 @@ int main(int argc, char** argv) {
 }
 ```
 **DEFER_BREAK** does not trigger cleanup, so you have to do it by yourself in certain cases.
+
+> Note, that DEFER works via **for** statement, so it is impossible to **DEFER_EXIT** or **DEFER_BEAK** from nested loops or switch
