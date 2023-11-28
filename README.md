@@ -4,6 +4,7 @@ It is a collection of macros I find useful
 | Name | Link | Description |
 | --- | --- | --- |
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h) | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
+| [TODO](#todo) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) | Provides TODO macro to make TODOs in code |
 
 # Defer
 Quick example:
@@ -90,3 +91,20 @@ int main(int argc, char** argv) {
 **DEFER_BREAK** does not trigger cleanup, so you have to do it by yourself in certain cases.
 
 > Note, that DEFER works via **for** statement, so it is impossible to **DEFER_EXIT** or **DEFER_BEAK** from nested loops or switch
+
+# TODO
+Quick example:
+```c
+#include "todo.h"
+
+int main(void) {
+    TODO("text");
+
+    return 0;
+}
+```
+When this program will reach **TODO** statement it will log into stdout message
+> Reached TODO at main.c:4
+> text
+
+and then it will exit with code 1
