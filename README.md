@@ -110,3 +110,14 @@ When this program will reach **TODO** statement it will log into stdout message
 > text
 
 and then it will exit with code 1
+
+Also this macro accepts **printf** like syntax:
+```c
+#include "todo.h"
+
+int main(void) {
+    TODO("Todo at line %d", __LINE__);
+
+    return 0;
+}
+```
