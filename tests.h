@@ -49,7 +49,7 @@
         char* operatorText;\
         char* expectText;\
         if(runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText) < 0) {\
-            printf("it %s ... FAILED\n", testLabel);\
+            printf("\nFailed test:\nit %s\n", testLabel);\
             printf("    At %s:%d\n", __FILE__, failLine);\
             printf("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
             if(expectText != NULL) {\
@@ -71,7 +71,7 @@
     )
 
 #define IT(LABEL)\
-    for(char i = 0, *testCaseLabel = *TESTS_testLabel = LABEL; i < 1; i += (printf("it "LABEL" ... PASSED\n"), 1))
+    for(char i = 0, *testCaseLabel = *TESTS_testLabel = LABEL; i < 1; i += (printf("it "LABEL"\n"), 1))
 
 #define EXPECT(VALUE)\
     if(1) {\
@@ -79,7 +79,6 @@
         *TESTS_failLine = __LINE__;\
         *TESTS_testText = #VALUE;\
         *TESTS_isNotFlag = 0;\
-        int isNot = 0;
 
 #define NOT\
     *TESTS_isNotFlag = 1;\
