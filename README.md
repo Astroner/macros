@@ -137,8 +137,10 @@ DESCRIBE("math") {
         EXPECT(2 * 2) TO_BE(4)
     }
 }
-// Output:
-// Describing 'math'
-// it sums ... PASSED
-// it multiplies ... PASSED
+/*
+Output:
+Describing 'math'
+it sums
+it multiplies
+*/
 ```
