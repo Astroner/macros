@@ -7,7 +7,7 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 | --- | --- | --- |
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h) | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) | Provides TODO macro to make TODOs in code |
-| [Tests](#tests) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests |
+| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests |
 
 # Defer
 Quick example:
