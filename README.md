@@ -7,6 +7,7 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 | --- | --- | --- |
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h) | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) | Provides TODO macro to make TODOs in code |
+| [Tests](#tests) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests |
 
 # Defer
 Quick example:
@@ -120,4 +121,24 @@ int main(void) {
 
     return 0;
 }
+```
+
+# Tests 
+Quick example:
+```c
+#include "tests.h"
+
+DESCRIBE("math") {
+    IT("sums") {
+        EXPECT(2 + 2) TO_BE(4)
+    }
+
+    IT("multiplies") {
+        EXPECT(2 * 2) TO_BE(4)
+    }
+}
+// Output:
+// Describing 'math'
+// it sums ... PASSED
+// it multiplies ... PASSED
 ```

@@ -1,33 +1,3 @@
-#if !defined(DEFER)
-#define DEFER
-
-#define DEFER(start, end) for(start, *i = 0x0; i != (void*)0x1; i = (end, (void*)0x1)) 
-#define DEFER_EXIT continue;
-#define DEFER_BREAK break;
-
-#endif // DEFER
-#include <stdlib.h>
-#include <stdio.h>
-
-#if !defined(TODO)
-
-#define TODO_STR2(arg) #arg
-#define TODO_STR(arg) TODO_STR2(arg)
-
-/*
-    TODO(text, args)
-    TODO("add this feature")
-    TODO("fix function for number %d", 4)
-*/
-#define TODO(...)\
-    do {\
-        printf("Reached TODO at "__FILE__":"TODO_STR(__LINE__)"\n");\
-        printf(__VA_ARGS__);\
-        putchar('\n');\
-        exit(1);\
-    } while(0);\
-
-#endif // TODO
 #if !defined(TESTS_H)
 #define TESTS_H
 

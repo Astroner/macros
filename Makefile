@@ -2,4 +2,4 @@ LIBNAME=macros.h
 
 .PHONY: concat
 concat:
-	cat defer.h todo.h > $(LIBNAME)
+	cat defer.h todo.h tests.h > $(LIBNAME)
