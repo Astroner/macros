@@ -63,9 +63,13 @@
         __typeof__((VALUE)) localPassedValue = (VALUE);\
         *TESTS_failLine = __LINE__;\
         *TESTS_testText = #VALUE;\
+        int isNot = 0;
+
+#define NOT\
+    isNot = 1;
 
 #define TO_BE(EXPECTED)\
-        if(localPassedValue != (EXPECTED)) {\
+        if((localPassedValue != (EXPECTED)) ^ isNot) {\
             *TESTS_expectText = #EXPECTED;\
             *TESTS_operatorText = "TO_BE";\
             return -1;\
