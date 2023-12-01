@@ -51,7 +51,7 @@
         if(runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText) < 0) {\
             printf("it %s ... FAILED\n", testLabel);\
             printf("    At %s:%d\n", __FILE__, failLine);\
-            printf("    EXPECT(%s) %s %s", testText, isNot ? "NOT" : "", operatorText);\
+            printf("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
             if(expectText != NULL) {\
                 printf("(%s)", expectText);\
             }\
@@ -75,7 +75,7 @@
 
 #define EXPECT(VALUE)\
     if(1) {\
-        __typeof__((VALUE)) localPassedValue = (VALUE);\
+        __typeof__((VALUE)) localPassedValue = VALUE;\
         *TESTS_failLine = __LINE__;\
         *TESTS_testText = #VALUE;\
         *TESTS_isNotFlag = 0;\
@@ -104,6 +104,14 @@
     if((!localPassedValue) ^ *TESTS_isNotFlag) {\
         *TESTS_expectText = NULL;\
         *TESTS_operatorText = "TO_BE_FALSY";\
+        return -1;\
+    }\
+};\
+
+#define TO_BE_STRING(EXPECTED_STRING)\
+    if((strcmp(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
+        *TESTS_expectText = #EXPECTED_STRING;\
+        *TESTS_operatorText = "TO_BE_STRING";\
         return -1;\
     }\
 };\

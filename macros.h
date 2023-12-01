@@ -62,28 +62,43 @@
 #define ADD_PRINTF_MOCK(BUFFER_SIZE) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_SIZE);
 
 #define DESCRIBE(LABEL) \
-    int runTests(int* TESTS_failLine, char** TESTS_testLabel,char** TESTS_testText, char** TESTS_operatorText, char** TESTS_expectText);\
+    int runTests(\
+        int* TESTS_failLine, \
+        char** TESTS_testLabel,\
+        char** TESTS_testText, \
+        int* TESTS_isNotFlag,\
+        char** TESTS_operatorText,\
+        char** TESTS_expectText\
+    );\
     int main(void) {\
         printf("\n\nDescribing '"LABEL"'\n");\
         int failLine;\
         char* testLabel;\
         char* testText;\
+        int isNot;\
         char* operatorText;\
         char* expectText;\
-        if(runTests(&failLine, &testLabel, &testText, &operatorText, &expectText) < 0) {\
+        if(runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText) < 0) {\
             printf("it %s ... FAILED\n", testLabel);\
             printf("    At %s:%d\n", __FILE__, failLine);\
+            printf("    EXPECT(%s) %s %s", testText, isNot ? "NOT" : "", operatorText);\
             if(expectText != NULL) {\
-                printf("    EXPECT(%s) %s(%s)\n", testText, operatorText, expectText);\
-            } else {\
-                printf("    EXPECT(%s) %s\n", testText, operatorText);\
+                printf("(%s)", expectText);\
             }\
+            printf("\n");\
         }\
 \
         printf("\n\n");\
         return 0;\
     }\
-    int runTests(int* TESTS_failLine, char** TESTS_testLabel,char** TESTS_testText, char** TESTS_operatorText, char** TESTS_expectText)
+    int runTests(\
+        int* TESTS_failLine, \
+        char** TESTS_testLabel,\
+        char** TESTS_testText, \
+        int* TESTS_isNotFlag,\
+        char** TESTS_operatorText,\
+        char** TESTS_expectText\
+    )
 
 #define IT(LABEL)\
     for(char i = 0, *testCaseLabel = *TESTS_testLabel = LABEL; i < 1; i += (printf("it "LABEL" ... PASSED\n"), 1))
@@ -93,9 +108,14 @@
         __typeof__((VALUE)) localPassedValue = (VALUE);\
         *TESTS_failLine = __LINE__;\
         *TESTS_testText = #VALUE;\
+        *TESTS_isNotFlag = 0;\
+        int isNot = 0;
+
+#define NOT\
+    *TESTS_isNotFlag = 1;\
 
 #define TO_BE(EXPECTED)\
-        if(localPassedValue != (EXPECTED)) {\
+        if((localPassedValue != (EXPECTED)) ^ *TESTS_isNotFlag) {\
             *TESTS_expectText = #EXPECTED;\
             *TESTS_operatorText = "TO_BE";\
             return -1;\
@@ -103,7 +123,7 @@
     };\
 
 #define TO_BE_TRUTHY\
-    if(!localPassedValue) {\
+    if((!localPassedValue) ^ *TESTS_isNotFlag) {\
         *TESTS_expectText = NULL;\
         *TESTS_operatorText = "TO_BE_TRUTHY";\
         return -1;\
@@ -111,7 +131,7 @@
 };\
 
 #define TO_BE_FALSY\
-    if(!localPassedValue) {\
+    if((!localPassedValue) ^ *TESTS_isNotFlag) {\
         *TESTS_expectText = NULL;\
         *TESTS_operatorText = "TO_BE_FALSY";\
         return -1;\
