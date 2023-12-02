@@ -31,14 +31,28 @@
 #if !defined(TESTS_H)
 #define TESTS_H
 
-#include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
+#include <stddef.h>
 
-#if !defined(TESTS_PRINT)
-    #define TESTS_PRINT printf
+#if !defined(TESTS_STD_PRINT)
+    #include <stdio.h>
+    #define TESTS_STD_PRINT printf
 #endif // TESTS_PRINT
 
+#if !defined(TESTS_STD_STRLEN)
+    #include <string.h>
+    #define TESTS_STD_STRLEN strlen
+#endif // TESTS_STD_STRLEN
+
+#if !defined(TESTS_STD_STRCMP)
+    #include <string.h>
+    #define TESTS_STD_STRCMP strcmp
+#endif // TESTS_STD_STRCMP
+
+#if !defined(TESTS_STD_MEMCMP)
+    #include <string.h>
+    #define TESTS_STD_MEMCMP memcmp
+#endif // TESTS_STD_MEMCMP
 
 #define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_SIZE)\
     char NAME##__buffer[BUFFER_SIZE + 1] = { '\0' };\
@@ -58,7 +72,7 @@
         NAME##__lastString = NAME##__buffer + NAME##__length;\
 \
         NAME##__buffer[BUFFER_SIZE] = '\0';\
-        NAME##__lastStringLength = strlen(NAME##__buffer + NAME##__length);\
+        NAME##__lastStringLength = TESTS_STD_STRLEN(NAME##__buffer + NAME##__length);\
         NAME##__length += NAME##__lastStringLength;\
 \
         return NAME##__lastStringLength;\
@@ -99,7 +113,7 @@
         int* TESTS_status\
     );\
     int main(void) {\
-        TESTS_PRINT("\n\nDescribing '"LABEL"'\n");\
+        TESTS_STD_PRINT("\n\nDescribing '"LABEL"'\n");\
         int failLine;\
         char* testLabel;\
         char* testText;\
@@ -109,16 +123,16 @@
         int status = 0;\
         runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText, &status);\
         if(status < 0) {\
-            TESTS_PRINT("\x1B[1;31mFailed:\n");\
-            TESTS_PRINT("    At %s:%d\n", __FILE__, failLine);\
-            TESTS_PRINT("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
+            TESTS_STD_PRINT("\x1B[1;31mFailed:\n");\
+            TESTS_STD_PRINT("    At %s:%d\n", __FILE__, failLine);\
+            TESTS_STD_PRINT("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
             if(expectText != NULL) {\
-                TESTS_PRINT("(%s)", expectText);\
+                TESTS_STD_PRINT("(%s)", expectText);\
             }\
-            TESTS_PRINT("\x1B[0m\n");\
+            TESTS_STD_PRINT("\x1B[0m\n");\
         }\
 \
-        TESTS_PRINT("\n\n");\
+        TESTS_STD_PRINT("\n\n");\
         return 0;\
     }\
     void runTests(\
@@ -134,13 +148,13 @@
 #if defined(WITH_AFTER_EACH)
     #define __IT(LABEL)\
         *TESTS_testLabel = LABEL;\
-        TESTS_PRINT("it "LABEL"\n");\
+        TESTS_STD_PRINT("it "LABEL"\n");\
         for(int i = 0; i < 1; i += (Tests__internal__afterEach(), 1))
         
 #else 
     #define __IT(LABEL)\
         *TESTS_testLabel = LABEL;\
-        TESTS_PRINT("it "LABEL"\n");
+        TESTS_STD_PRINT("it "LABEL"\n");
 #endif // WITH_AFTER_EACH
 
 
@@ -192,11 +206,28 @@
     };\
 
 #define TO_BE_STRING(EXPECTED_STRING)\
-        if((strcmp(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
+        if((TESTS_STD_STRCMP(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
             *TESTS_status = -1;\
             *TESTS_expectText = #EXPECTED_STRING;\
             *TESTS_operatorText = "TO_BE_STRING";\
             return;\
+        }\
+    };\
+
+#define TO_BE_NULL\
+        if((localPassedValue != NULL) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
+            *TESTS_expectText = NULL;\
+            *TESTS_operatorText = "TO_BE_NULL";\
+            return;\
+        }\
+    };\
+
+#define TO_HAVE_BYTES(BYTES, LENGTH)\
+        if((TESTS_STD_MEMCMP(localPassedValue, BYTES, LENGTH) != 0) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
+            *TESTS_expectText = #BYTES", "#LENGTH;\
+            *TESTS_operatorText = "TO_HAVE_BYTES";\
         }\
     };\
 
