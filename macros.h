@@ -65,6 +65,13 @@
 
 #define ADD_PRINTF_MOCK(BUFFER_SIZE) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_SIZE);
 
+
+#if defined(WITH_BEFORE_EACH)
+    void Tests__internal__beforeEach();
+
+    #define BEFORE_EACH void Tests__internal__beforeEach()
+#endif // WITH_BEFORE_EACH
+
 #define DESCRIBE(LABEL) \
     int runTests(\
         int* TESTS_failLine, \
@@ -104,8 +111,18 @@
         char** TESTS_expectText\
     )
 
-#define IT(LABEL)\
+#define __IT(LABEL)\
     for(char i = 0, *testCaseLabel = *TESTS_testLabel = LABEL; i < 1; i += (printf("it "LABEL"\n"), 1))
+
+#if defined(WITH_BEFORE_EACH)
+    #define IT(LABEL)\
+        Tests__internal__beforeEach();\
+        __IT(LABEL);
+#else
+    #define IT(LABEL)\
+        __IT(LABEL);
+#endif // WITH_BEFORE_EACH
+
 
 #define EXPECT(VALUE)\
     if(1) {\
