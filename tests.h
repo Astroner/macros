@@ -5,9 +5,14 @@
 #include <stdarg.h>
 #include <string.h>
 
+#if !defined(TESTS_PRINT)
+    #define TESTS_PRINT printf
+#endif // TESTS_PRINT
+
+
 #define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_SIZE)\
     char NAME##__buffer[BUFFER_SIZE + 1] = { '\0' };\
-    char NAME##__length = 0;\
+    size_t NAME##__length = 0;\
     char* NAME##__lastString = NAME##__buffer;\
     size_t NAME##__lastStringLength = 0;\
 \
@@ -46,98 +51,123 @@
     #define BEFORE_EACH void Tests__internal__beforeEach()
 #endif // WITH_BEFORE_EACH
 
+#if defined(WITH_AFTER_EACH)
+    void Tests__internal__afterEach();
+
+    #define AFTER_EACH void Tests__internal__afterEach()
+#endif // WITH_AFTER_EACH
+
+
 #define DESCRIBE(LABEL) \
-    int runTests(\
+    void runTests(\
         int* TESTS_failLine, \
         char** TESTS_testLabel,\
         char** TESTS_testText, \
         int* TESTS_isNotFlag,\
         char** TESTS_operatorText,\
-        char** TESTS_expectText\
+        char** TESTS_expectText,\
+        int* TESTS_status\
     );\
     int main(void) {\
-        printf("\n\nDescribing '"LABEL"'\n");\
+        TESTS_PRINT("\n\nDescribing '"LABEL"'\n");\
         int failLine;\
         char* testLabel;\
         char* testText;\
         int isNot;\
         char* operatorText;\
         char* expectText;\
-        if(runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText) < 0) {\
-            printf("\nFailed test:\nit %s\n", testLabel);\
-            printf("    At %s:%d\n", __FILE__, failLine);\
-            printf("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
+        int status = 0;\
+        runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText, &status);\
+        if(status < 0) {\
+            TESTS_PRINT("\x1B[1;31mFailed:\n");\
+            TESTS_PRINT("    At %s:%d\n", __FILE__, failLine);\
+            TESTS_PRINT("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
             if(expectText != NULL) {\
-                printf("(%s)", expectText);\
+                TESTS_PRINT("(%s)", expectText);\
             }\
-            printf("\n");\
+            TESTS_PRINT("\x1B[0m\n");\
         }\
 \
-        printf("\n\n");\
+        TESTS_PRINT("\n\n");\
         return 0;\
     }\
-    int runTests(\
+    void runTests(\
         int* TESTS_failLine, \
         char** TESTS_testLabel,\
         char** TESTS_testText, \
         int* TESTS_isNotFlag,\
         char** TESTS_operatorText,\
-        char** TESTS_expectText\
+        char** TESTS_expectText,\
+        int* TESTS_status\
     )
 
-#define __IT(LABEL)\
-    for(char i = 0, *testCaseLabel = *TESTS_testLabel = LABEL; i < 1; i += (printf("it "LABEL"\n"), 1))
+#if defined(WITH_AFTER_EACH)
+    #define __IT(LABEL)\
+        *TESTS_testLabel = LABEL;\
+        TESTS_PRINT("it "LABEL"\n");\
+        for(int i = 0; i < 1; i += (Tests__internal__afterEach(), 1))
+        
+#else 
+    #define __IT(LABEL)\
+        *TESTS_testLabel = LABEL;\
+        TESTS_PRINT("it "LABEL"\n");
+#endif // WITH_AFTER_EACH
+
 
 #if defined(WITH_BEFORE_EACH)
     #define IT(LABEL)\
         Tests__internal__beforeEach();\
-        __IT(LABEL);
+        __IT(LABEL)
 #else
     #define IT(LABEL)\
-        __IT(LABEL);
+        __IT(LABEL)
 #endif // WITH_BEFORE_EACH
 
 
 #define EXPECT(VALUE)\
-    if(1) {\
+    {\
         __typeof__((VALUE)) localPassedValue = VALUE;\
         *TESTS_failLine = __LINE__;\
         *TESTS_testText = #VALUE;\
         *TESTS_isNotFlag = 0;\
 
 #define NOT\
-    *TESTS_isNotFlag = 1;\
+        *TESTS_isNotFlag = 1;\
 
 #define TO_BE(EXPECTED)\
         if((localPassedValue != (EXPECTED)) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
             *TESTS_expectText = #EXPECTED;\
             *TESTS_operatorText = "TO_BE";\
-            return -1;\
+            return;\
         }\
     };\
 
 #define TO_BE_TRUTHY\
-    if((!localPassedValue) ^ *TESTS_isNotFlag) {\
-        *TESTS_expectText = NULL;\
-        *TESTS_operatorText = "TO_BE_TRUTHY";\
-        return -1;\
-    }\
-};\
+        if((!localPassedValue) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
+            *TESTS_expectText = NULL;\
+            *TESTS_operatorText = "TO_BE_TRUTHY";\
+            return;\
+        }\
+    };\
 
 #define TO_BE_FALSY\
-    if((!localPassedValue) ^ *TESTS_isNotFlag) {\
-        *TESTS_expectText = NULL;\
-        *TESTS_operatorText = "TO_BE_FALSY";\
-        return -1;\
-    }\
-};\
+        if((!localPassedValue) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
+            *TESTS_expectText = NULL;\
+            *TESTS_operatorText = "TO_BE_FALSY";\
+            return;\
+        }\
+    };\
 
 #define TO_BE_STRING(EXPECTED_STRING)\
-    if((strcmp(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
-        *TESTS_expectText = #EXPECTED_STRING;\
-        *TESTS_operatorText = "TO_BE_STRING";\
-        return -1;\
-    }\
-};\
+        if((strcmp(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
+            *TESTS_status = -1;\
+            *TESTS_expectText = #EXPECTED_STRING;\
+            *TESTS_operatorText = "TO_BE_STRING";\
+            return;\
+        }\
+    };\
 
 #endif // TESTS_H
