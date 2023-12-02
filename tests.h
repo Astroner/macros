@@ -73,31 +73,28 @@
 
 
 #define DESCRIBE(LABEL) \
-    void runTests(\
-        int* TESTS_failLine, \
-        char** TESTS_testLabel,\
-        char** TESTS_testText, \
-        int* TESTS_isNotFlag,\
-        char** TESTS_operatorText,\
-        char** TESTS_expectText,\
-        int* TESTS_status\
-    );\
-    int main(void) {\
-        TESTS_STD_PRINT("\n\nDescribing '"LABEL"'\n");\
+    struct TESTS_infoType {\
         int failLine;\
         char* testLabel;\
-        char* testText;\
-        int isNot;\
+        char* testText; \
+        int* isNot;\
         char* operatorText;\
         char* expectText;\
-        int status = 0;\
-        runTests(&failLine, &testLabel, &testText, &isNot, &operatorText, &expectText, &status);\
-        if(status < 0) {\
+        int status;\
+    };\
+    void runTests(struct TESTS_infoType* TESTS_info);\
+    int main(void) {\
+        TESTS_STD_PRINT("\n\n\x1B[1;33mDescribing '"LABEL"'\x1B[0m\n");\
+        struct TESTS_infoType info = {\
+            .status = 0\
+        };\
+        runTests(&info);\
+        if(info.status < 0) {\
             TESTS_STD_PRINT("\x1B[1;31mFailed:\n");\
-            TESTS_STD_PRINT("    At %s:%d\n", __FILE__, failLine);\
-            TESTS_STD_PRINT("    EXPECT(%s)%s%s", testText, isNot ? " NOT " : " ", operatorText);\
-            if(expectText != NULL) {\
-                TESTS_STD_PRINT("(%s)", expectText);\
+            TESTS_STD_PRINT("    At %s:%d\n", __FILE__, info.failLine);\
+            TESTS_STD_PRINT("    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
+            if(info.expectText != NULL) {\
+                TESTS_STD_PRINT("(%s)", info.expectText);\
             }\
             TESTS_STD_PRINT("\x1B[0m\n");\
         }\
@@ -105,25 +102,20 @@
         TESTS_STD_PRINT("\n\n");\
         return 0;\
     }\
-    void runTests(\
-        int* TESTS_failLine, \
-        char** TESTS_testLabel,\
-        char** TESTS_testText, \
-        int* TESTS_isNotFlag,\
-        char** TESTS_operatorText,\
-        char** TESTS_expectText,\
-        int* TESTS_status\
-    )
+    void runTests(struct TESTS_infoType* TESTS_info)
+
+#define IT_TODO(LABEL)\
+    TESTS_info->status = 0;\
+    TESTS_STD_PRINT("\x1B[1;35mTODO: it "LABEL"\x1B[0m\n")
 
 #if defined(WITH_AFTER_EACH)
     #define __IT(LABEL)\
-        *TESTS_testLabel = LABEL;\
+        TESTS_info->testLabel = LABEL;\
         TESTS_STD_PRINT("it "LABEL"\n");\
         for(int i = 0; i < 1; i += (Tests__internal__afterEach(), 1))
-        
 #else 
     #define __IT(LABEL)\
-        *TESTS_testLabel = LABEL;\
+        TESTS_info->testLabel = LABEL;\
         TESTS_STD_PRINT("it "LABEL"\n");
 #endif // WITH_AFTER_EACH
 
@@ -141,63 +133,63 @@
 #define EXPECT(VALUE)\
     {\
         __typeof__((VALUE)) localPassedValue = VALUE;\
-        *TESTS_failLine = __LINE__;\
-        *TESTS_testText = #VALUE;\
-        *TESTS_isNotFlag = 0;\
+        TESTS_info->failLine = __LINE__;\
+        TESTS_info->testText = #VALUE;\
+        TESTS_info->isNot = 0;\
 
 #define NOT\
-        *TESTS_isNotFlag = 1;\
+        TESTS_info->isNot = 1;\
 
 #define TO_BE(EXPECTED)\
-        if((localPassedValue != (EXPECTED)) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = #EXPECTED;\
-            *TESTS_operatorText = "TO_BE";\
+        if((localPassedValue != (EXPECTED)) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = #EXPECTED;\
+            TESTS_info->operatorText = "TO_BE";\
             return;\
         }\
     };\
 
 #define TO_BE_TRUTHY\
-        if((!localPassedValue) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = NULL;\
-            *TESTS_operatorText = "TO_BE_TRUTHY";\
+        if((!localPassedValue) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = NULL;\
+            TESTS_info->operatorText = "TO_BE_TRUTHY";\
             return;\
         }\
     };\
 
 #define TO_BE_FALSY\
-        if((!localPassedValue) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = NULL;\
-            *TESTS_operatorText = "TO_BE_FALSY";\
+        if((!localPassedValue) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = NULL;\
+            TESTS_info->operatorText = "TO_BE_FALSY";\
             return;\
         }\
     };\
 
 #define TO_BE_STRING(EXPECTED_STRING)\
-        if((TESTS_STD_STRCMP(localPassedValue, EXPECTED_STRING) != 0) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = #EXPECTED_STRING;\
-            *TESTS_operatorText = "TO_BE_STRING";\
+        if((TESTS_STD_STRCMP(localPassedValue, EXPECTED_STRING) != 0) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = #EXPECTED_STRING;\
+            TESTS_info->operatorText = "TO_BE_STRING";\
             return;\
         }\
     };\
 
 #define TO_BE_NULL\
-        if((localPassedValue != NULL) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = NULL;\
-            *TESTS_operatorText = "TO_BE_NULL";\
+        if((localPassedValue != NULL) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = NULL;\
+            TESTS_info->operatorText = "TO_BE_NULL";\
             return;\
         }\
     };\
 
 #define TO_HAVE_BYTES(BYTES, LENGTH)\
-        if((TESTS_STD_MEMCMP(localPassedValue, BYTES, LENGTH) != 0) ^ *TESTS_isNotFlag) {\
-            *TESTS_status = -1;\
-            *TESTS_expectText = #BYTES", "#LENGTH;\
-            *TESTS_operatorText = "TO_HAVE_BYTES";\
+        if((TESTS_STD_MEMCMP(localPassedValue, BYTES, LENGTH) != 0) ^ TESTS_info->isNot) {\
+            TESTS_info->status = -1;\
+            TESTS_info->expectText = #BYTES", "#LENGTH;\
+            TESTS_info->operatorText = "TO_HAVE_BYTES";\
         }\
     };\
 
