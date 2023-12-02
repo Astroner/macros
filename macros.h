@@ -62,6 +62,10 @@
     void NAME##__reset() {\
         NAME##__length = 0;\
     }\
+    \
+    char* NAME##__checkPoint() {\
+        return NAME##__buffer + NAME##__length;\
+    }\
 
 #define ADD_PRINTF_MOCK(BUFFER_SIZE) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_SIZE);
 
