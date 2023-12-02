@@ -68,7 +68,7 @@
         NAME##__length = 0;\
     }\
     \
-    char* NAME##__checkPoint() {\
+    char* NAME##__nextString() {\
         return NAME##__buffer + NAME##__length;\
     }\
 
