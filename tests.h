@@ -77,7 +77,7 @@
         int failLine;\
         char* testLabel;\
         char* testText; \
-        int* isNot;\
+        int isNot;\
         char* operatorText;\
         char* expectText;\
         int status;\
@@ -111,12 +111,12 @@
 #if defined(WITH_AFTER_EACH)
     #define __IT(LABEL)\
         TESTS_info->testLabel = LABEL;\
-        TESTS_STD_PRINT("it "LABEL"\n");\
+        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n");\
         for(int i = 0; i < 1; i += (Tests__internal__afterEach(), 1))
 #else 
     #define __IT(LABEL)\
         TESTS_info->testLabel = LABEL;\
-        TESTS_STD_PRINT("it "LABEL"\n");
+        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n")
 #endif // WITH_AFTER_EACH
 
 
