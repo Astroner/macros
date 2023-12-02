@@ -8,6 +8,8 @@
 #define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_SIZE)\
     char NAME##__buffer[BUFFER_SIZE + 1] = { '\0' };\
     char NAME##__length = 0;\
+    char* NAME##__lastString = NAME##__buffer;\
+    size_t NAME##__lastStringLength = 0;\
 \
     int NAME(const char* format, ...) {\
         if(NAME##__length == BUFFER_SIZE) {\
@@ -18,11 +20,13 @@
         vsnprintf(NAME##__buffer + NAME##__length, BUFFER_SIZE - NAME##__length + 1, format, argptr);\
         va_end(argptr);\
 \
-        NAME##__buffer[BUFFER_SIZE] = '\0';\
-        size_t writtenLength = strlen(NAME##__buffer + NAME##__length);\
-        NAME##__length += writtenLength;\
+        NAME##__lastString = NAME##__buffer + NAME##__length;\
 \
-        return writtenLength;\
+        NAME##__buffer[BUFFER_SIZE] = '\0';\
+        NAME##__lastStringLength = strlen(NAME##__buffer + NAME##__length);\
+        NAME##__length += NAME##__lastStringLength;\
+\
+        return NAME##__lastStringLength;\
     }\
     \
     void NAME##__reset() {\
