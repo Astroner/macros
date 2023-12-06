@@ -24,24 +24,24 @@
     #define TESTS_STD_MEMCMP memcmp
 #endif // TESTS_STD_MEMCMP
 
-#define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_SIZE)\
-    char NAME##__buffer[BUFFER_SIZE + 1] = { '\0' };\
+#define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_LENGTH)\
+    char NAME##__buffer[BUFFER_LENGTH + 1] = { '\0' };\
     size_t NAME##__length = 0;\
     char* NAME##__lastString = NAME##__buffer;\
     size_t NAME##__lastStringLength = 0;\
 \
     int NAME(const char* format, ...) {\
-        if(NAME##__length == BUFFER_SIZE) {\
+        if(NAME##__length == BUFFER_LENGTH) {\
             return -1;\
         }\
         va_list argptr;\
         va_start(argptr, format);\
-        vsnprintf(NAME##__buffer + NAME##__length, BUFFER_SIZE - NAME##__length + 1, format, argptr);\
+        vsnprintf(NAME##__buffer + NAME##__length, BUFFER_LENGTH - NAME##__length + 1, format, argptr);\
         va_end(argptr);\
 \
         NAME##__lastString = NAME##__buffer + NAME##__length;\
 \
-        NAME##__buffer[BUFFER_SIZE] = '\0';\
+        NAME##__buffer[BUFFER_LENGTH] = '\0';\
         NAME##__lastStringLength = TESTS_STD_STRLEN(NAME##__buffer + NAME##__length);\
         NAME##__length += NAME##__lastStringLength;\
 \
@@ -56,7 +56,7 @@
         return NAME##__buffer + NAME##__length;\
     }\
 
-#define ADD_PRINTF_MOCK(BUFFER_SIZE) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_SIZE);
+#define ADD_PRINTF_MOCK(BUFFER_LENGTH) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_LENGTH);
 
 
 #if defined(WITH_BEFORE_EACH)
@@ -106,7 +106,7 @@
 
 #define IT_TODO(LABEL)\
     TESTS_info->status = 0;\
-    TESTS_STD_PRINT("\x1B[1;35mTODO: it "LABEL"\x1B[0m\n")
+    TESTS_STD_PRINT("\x1B[1;35mTODO: it "LABEL"\x1B[0m\n");
 
 #if defined(WITH_AFTER_EACH)
     #define __IT(LABEL)\
@@ -116,7 +116,7 @@
 #else 
     #define __IT(LABEL)\
         TESTS_info->testLabel = LABEL;\
-        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n")
+        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n");
 #endif // WITH_AFTER_EACH
 
 
