@@ -137,10 +137,10 @@ DESCRIBE("math") {
         EXPECT(2 * 2) TO_BE(4)
     }
 }
+// Describing 'math'
+// it sums
+// it multiplies
 ```
-> Describing 'math'
-> it sums
-> it multiplies
 
 ## Content
  - [Structure](#structure)
@@ -223,8 +223,9 @@ DESCRIBE("math") {
 ```
 
 ### TO_BE_STRING
-Assumes that provided value to check is pointer to a string and with function **TESTS_STD_STRCMP** compares provided and expected strings.
-> **TESTS_STD_STRCMP** function can be overridden by defining it before including *tests.h*
+Assumes that provided value is pointer to a string and with function **TESTS_STD_STRCMP** compares provided and expected strings.
+> **TESTS_STD_STRCMP** function can be overridden by defining it before including *tests.h*.
+
 > By default it uses string's **strcmp**
 
 ```c
