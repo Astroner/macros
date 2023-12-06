@@ -3,11 +3,11 @@ It is a collection of macros I find useful
 
 File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.h) contains all the macros provided by this repo
 
-| Name | Link | Description |
-| --- | --- | --- |
+| Name            | Link                                                                        | Description                                        |
+|-----------------|-----------------------------------------------------------------------------|----------------------------------------------------|
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h) | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
-| [TODO](#todo) | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) | Provides TODO macro to make TODOs in code |
-| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests |
+| [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)   | Provides TODO macro to make TODOs in code          |
+| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests                           |
 
 # Defer
 Quick example:
