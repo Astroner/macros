@@ -224,7 +224,7 @@ DESCRIBE("math") {
 
 ### TO_BE_STRING
 Assumes that provided value is pointer to a string and with function **TESTS_STD_STRCMP** compares provided and expected strings.
-> **TESTS_STD_STRCMP** function can be overridden by defining it before including *tests.h*.
+> **TESTS_STD_STRCMP** function can be overridden by defining it before including [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h).
 
 > By default it uses string's **strcmp**
 
@@ -256,7 +256,8 @@ DESCRIBE("malloc") {
 
 ### TO_HAVE_BYTES
 Assumes that provided value is a pointer and compares it with expected bytes with function **TESTS_STD_MEMCMP**.
-> **TESTS_STD_MEMCMP** function can be overridden by defining it before including *tests.h*
+> **TESTS_STD_MEMCMP** function can be overridden by defining it before including [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)
+
 > By default it uses string's **memcmp**
 ```c
 #include "tests.h"
@@ -274,7 +275,7 @@ DESCRIBE("char arrays") {
 This section describes macros to add actions before/after each test.
 
 ### BEFORE_EACH
-To use **BEFORE_EACH** statement you need to define **WITH_BEFORE_EACH** before including *tests.h*
+To use **BEFORE_EACH** statement you need to define **WITH_BEFORE_EACH** before including [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)
 ```c
 #define WITH_BEFORE_EACH
 #include "tests.h"
@@ -323,7 +324,7 @@ DESCRIBE("AFTER_EACH") {
 ```
 
 ## Printf like functions
-*tests.h* provides several macros to define **printf** like functions
+[todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) provides several macros to define **printf** like functions
 
 ### CREATE_PRINTF_LIKE_FUNCTION
 **CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_LENGTH)** defines function with provided **NAME** that has signature **int NAME(const char* format, ...)** and imitates **printf** function/macro but writes into buffer with length **BUFFER_LENGTH**. Macro defines several variables and functions prefixed with **NAME**. 
@@ -370,7 +371,7 @@ int main(void) {
 ```
 
 ## Overrides
-*tests.h* can be used as a almost completely standalone header file that depends only on *stdarg.h* and *stddef.h* by defining all required functions before including *tests.h*
+[todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h) can be used as a almost completely standalone header file that depends only on *stdarg.h* and *stddef.h* by defining all required functions before including [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)
 
 List of overrides:
 | Macro name       | Default value         | Usage                                                                                                        |
