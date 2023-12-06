@@ -160,7 +160,7 @@ DESCRIBE("math") {
  - [Overrides](#overrides)
 
 ## Structure
-Test starts with **DESCRIBE** macro, which initiates everything with provided label. There can only be one **DESCRIBE** per program.
+Test starts with **DESCRIBE** macro, which initiates everything with provided label including main function. There can only be one **DESCRIBE** per program.
 Inside of **DESCRIBE** **IT** constructions go, actually describing test cases.
 Then go **EXPECT** with matchers. So the general structure looks like this:
 ```c
