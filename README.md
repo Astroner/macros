@@ -180,6 +180,19 @@ DESCRIBE(LABEL) {
 }
 ```
 
+Also you can add **IT_TODO** to create a test that will be implemented later.
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+DESCRIBE(math) {
+    IT_TODO("works")
+}
+
+// Describing 'math'
+// TODO: it works
+```
+
 ## Matchers
 Any matcher can be modified with **NOT**:
 ```c
