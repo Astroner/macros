@@ -1,13 +1,14 @@
 # Hi there
 It is a collection of macros I find useful
 
-File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.h) contains all the macros provided by this repo
+File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.h) contains all the macros provided by this repo except [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)
 
-| Name            | Link                                                                        | Description                                        |
-|-----------------|-----------------------------------------------------------------------------|----------------------------------------------------|
-| [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h) | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
-| [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)   | Provides TODO macro to make TODOs in code          |
-| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) | Various macros for tests                           |
+| Name            | Link                                                                                | Description                                        |
+|-----------------|-------------------------------------------------------------------------------------|----------------------------------------------------|
+| [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
+| [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)           | Provides TODO macro to make TODOs in code          |
+| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)         | Various macros for tests                           |
+| [Tests](#tests) | [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) | File required for tests                            |
 
 # Defer
 Quick example:
@@ -126,9 +127,10 @@ int main(void) {
 # Tests 
 Quick example:
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(2 + 2) TO_BE(4)
     }
@@ -143,7 +145,7 @@ DESCRIBE("math") {
 ```
 
 ## Content
- - [Structure](#structure)
+ - [Test file structure](#test-file-structure)
  - [Matchers](#matchers)
      - [TO_BE](#to_be)
      - [TO_BE_TRUTHY](#to_be_truthy)
@@ -154,19 +156,22 @@ DESCRIBE("math") {
  - [Test suit hooks](#test-suit-hooks)
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
+ - [Multiple test files](#multiple-test-files)
  - [Printf like functions](#printf-like-functions)
      - [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
      - [ADD_PRINTF_MOCK](#add_printf_mock)
  - [Overrides](#overrides)
 
-## Structure
-Test starts with **DESCRIBE** macro, which initiates everything with provided label including main function. There can only be one **DESCRIBE** per program.
-Inside of **DESCRIBE** **IT** constructions go, actually describing test cases.
-Then go **EXPECT** with matchers. So the general structure looks like this:
+## Test file structure
+Each test file should begin with inclusion of [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) to do some macro preparations, only then [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) should be included.
+Test starts with **DESCRIBE** macro, which initiates everything with provided label including main function. There can only be one **DESCRIBE** per program if **MULTI_TEST** is not defined([More about multiple test files](#multiple-test-files)). **DESCRIBE** macro accepts test suit identifier/name.
+**DESCRIBE** contains **IT** statements, actually describing test cases.
+Then goes **EXPECT** with matchers. So the general structure looks like this:
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("LABEL") {
+DESCRIBE(LABEL) {
     // ... it statements
     IT("LABEL") {
         EXPECT(something) // ... matcher
@@ -177,9 +182,10 @@ DESCRIBE("LABEL") {
 ## Matchers
 Any matcher can be modified with **NOT**:
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(2 + 2) NOT TO_BE(5);
     }
@@ -189,9 +195,10 @@ DESCRIBE("math") {
 ### TO_BE
 Simplest matcher, test value to be equal to expected one
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(2 + 2) TO_BE(4);
     }
@@ -201,9 +208,10 @@ DESCRIBE("math") {
 ### TO_BE_TRUTHY
 Checks that value is reducible to **true**(1) via **!!** operation
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(2 + 2) TO_BE_TRUTHY;
     }
@@ -213,9 +221,10 @@ DESCRIBE("math") {
 ### TO_BE_FALSY
 [TO_BE_TRUTHY](#to_be_truthy) but in reverse
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(2 - 2) TO_BE_FALSY;
     }
@@ -229,9 +238,10 @@ Assumes that provided value is pointer to a string and with function **TESTS_STD
 > By default it uses string's **strcmp**
 
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("strings") {
+DESCRIBE(strings) {
     IT("exists") {
         char* str = "test string";
         EXPECT(str) TO_BE_STRING("test string");
@@ -242,11 +252,13 @@ DESCRIBE("strings") {
 ### TO_BE_NULL
 Assumes that provided value is a pointers and checks that it is **NULL**
 ```c
+#include "tests-new.h"
+
 #include <stdlib.h>
 
 #include "tests.h"
 
-DESCRIBE("malloc") {
+DESCRIBE(mallocTests) {
     IT("it allocates") {
         char* mem = malloc(22);
         EXPECT(mem) NOT TO_BE_NULL;
@@ -260,9 +272,10 @@ Assumes that provided value is a pointer and compares it with expected bytes wit
 
 > By default it uses string's **memcmp**
 ```c
+#include "tests-new.h"
 #include "tests.h"
 
-DESCRIBE("char arrays") {
+DESCRIBE(charArrays) {
     IT("is comparable with string") {
         char array[] = { 'a', 'b' };
 
@@ -277,18 +290,20 @@ This section describes macros to add actions before/after each test.
 ### BEFORE_EACH
 To use **BEFORE_EACH** statement you need to define **WITH_BEFORE_EACH** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)
 ```c
+#include "tests-new.h"
+
 #define WITH_BEFORE_EACH
 #include "tests.h"
 
 int a = 0;
 int b = 0;
 
-BEFORE_EACH {
+BEFORE_EACH(math) {
     a = 2;
     b = 2;
 }
 
-DESCRIBE("math") {
+DESCRIBE(math) {
     IT("sums") {
         EXPECT(a + b) TO_BE(4)
     }
@@ -298,21 +313,23 @@ DESCRIBE("math") {
     }
 }
 ```
-**BEFORE_EACH** block will be executed before each **IT** statement
+**BEFORE_EACH** block will be executed before each **IT** statement. **BEFORE_EACH** statement should be initiated with the same **LABEL** that is passed to **DESCRIBE** statement action is attached to.
 
 ### AFTER_EACH
 Works same as [BEFORE_EACH](#before_each) but code block is executed after each **IT** statement. To use it you also need to define **WITH_AFTER_EACH**
 ```c
+#include "tests-new.h"
+
 #define WITH_AFTER_EACH
 #include "tests.h"
 
 int result = 0;
 
-AFTER_EACH {
+AFTER_EACH(AFTER_EACH_SHOWCASE) {
     result = 2;
 }
 
-DESCRIBE("AFTER_EACH") {
+DESCRIBE(AFTER_EACH_SHOWCASE) {
     IT("does nothing here") {
         EXPECT(result) TO_BE(0)
     }
@@ -322,6 +339,21 @@ DESCRIBE("AFTER_EACH") {
     }
 }
 ```
+
+## Multiple test files
+Quick example:
+```c
+#include "tests-new.h"
+
+#define MULTI_TEST
+#include "tests.h"
+
+#include "test1.c"
+#include "test2.c"
+
+RUN_TESTS(test1, test2)
+```
+To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
 
 ## Printf like functions
 [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) provides several macros to define **printf** like functions

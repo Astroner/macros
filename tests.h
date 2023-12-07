@@ -1,3 +1,20 @@
+
+#if !defined(TESTS_TYPES)
+    #define TESTS_TYPES
+    typedef void TESTS_ActionFunction(void);\
+    struct TESTS_infoType {\
+        int failLine;\
+        char* testLabel;\
+        char* testText; \
+        int isNot;\
+        char* operatorText;\
+        char* expectText;\
+        int status;\
+        TESTS_ActionFunction* beforeEach;\
+        TESTS_ActionFunction* afterEach;\
+    };
+#endif // TESTS_TYPES
+
 #if !defined(TESTS_H)
 #define TESTS_H
 
@@ -30,6 +47,7 @@
     char* NAME##__lastString = NAME##__buffer;\
     size_t NAME##__lastStringLength = 0;\
 \
+    int NAME(const char* format, ...);\
     int NAME(const char* format, ...) {\
         if(NAME##__length == BUFFER_LENGTH) {\
             return -1;\
@@ -48,11 +66,13 @@
         return NAME##__lastStringLength;\
     }\
     \
-    void NAME##__reset() {\
+    void NAME##__reset(void);\
+    void NAME##__reset(void) {\
         NAME##__length = 0;\
     }\
     \
-    char* NAME##__nextString() {\
+    char* NAME##__nextString(void);\
+    char* NAME##__nextString(void) {\
         return NAME##__buffer + NAME##__length;\
     }\
 
@@ -60,75 +80,95 @@
 
 
 #if defined(WITH_BEFORE_EACH)
-    void Tests__internal__beforeEach();
-
-    #define BEFORE_EACH void Tests__internal__beforeEach()
+    #define BEFORE_EACH(LABEL) void LABEL##__beforeEach(void); void LABEL##__beforeEach(void)
+    #define __ADD_BEFORE_EACH(LABEL) .beforeEach = LABEL##__beforeEach,
+#else 
+    #define __ADD_BEFORE_EACH(LABEL) .beforeEach = NULL,
 #endif // WITH_BEFORE_EACH
 
 #if defined(WITH_AFTER_EACH)
-    void Tests__internal__afterEach();
-
-    #define AFTER_EACH void Tests__internal__afterEach()
+    #define AFTER_EACH(LABEL) void LABEL##__afterEach(void); void LABEL##__afterEach(void)
+    #define __ADD_AFTER_EACH(LABEL) .afterEach = LABEL##__afterEach,
+#else
+    #define __ADD_AFTER_EACH(LABEL) .afterEach = NULL,
 #endif // WITH_AFTER_EACH
 
-
-#define DESCRIBE(LABEL) \
-    struct TESTS_infoType {\
-        int failLine;\
-        char* testLabel;\
-        char* testText; \
-        int isNot;\
-        char* operatorText;\
-        char* expectText;\
-        int status;\
-    };\
-    void runTests(struct TESTS_infoType* TESTS_info);\
-    int main(void) {\
-        TESTS_STD_PRINT("\n\n\x1B[1;33mDescribing '"LABEL"'\x1B[0m\n");\
-        struct TESTS_infoType info = {\
-            .status = 0\
-        };\
-        runTests(&info);\
-        if(info.status < 0) {\
-            TESTS_STD_PRINT("\x1B[1;31mFailed:\n");\
-            TESTS_STD_PRINT("    At %s:%d\n", __FILE__, info.failLine);\
-            TESTS_STD_PRINT("    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
-            if(info.expectText != NULL) {\
-                TESTS_STD_PRINT("(%s)", info.expectText);\
+#if defined(MULTI_TEST)
+    #define DESCRIBE(LABEL) \
+        void LABEL##__runTests(struct TESTS_infoType* TESTS_info);\
+        int LABEL(void) {\
+            TESTS_STD_PRINT("\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+            struct TESTS_infoType info = {\
+                .status = 0,\
+                __ADD_BEFORE_EACH(LABEL)\
+                __ADD_AFTER_EACH(LABEL)\
+            };\
+            LABEL##__runTests(&info);\
+            if(info.status < 0) {\
+                TESTS_STD_PRINT("\x1B[1;31mFailed:\n");\
+                TESTS_STD_PRINT("    At %s:%d\n", __FILE__, info.failLine);\
+                TESTS_STD_PRINT("    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
+                if(info.expectText != NULL) {\
+                    TESTS_STD_PRINT("(%s)", info.expectText);\
+                }\
+                TESTS_STD_PRINT("\x1B[0m\n");\
             }\
-            TESTS_STD_PRINT("\x1B[0m\n");\
+    \
+            return 0;\
         }\
+        void LABEL##__runTests(struct TESTS_infoType* TESTS_info)
+    
+    #define RUN_TESTS(...)\
+        typedef int TestSuit(void);\
+        int main(void) {\
+            TestSuit* suits[] = { __VA_ARGS__ };\
 \
-        TESTS_STD_PRINT("\n\n");\
-        return 0;\
+            TESTS_STD_PRINT("\n\n");\
+            for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                suits[i]();\
+                TESTS_STD_PRINT("\n");\
+            }\
+            TESTS_STD_PRINT("\n\n");\
+            return 0;\
+        }
+#else
+    #define DESCRIBE(LABEL) \
+        void runTests(struct TESTS_infoType* TESTS_info);\
+        int main(void) {\
+            TESTS_STD_PRINT("\n\n\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+            struct TESTS_infoType info = {\
+                .status = 0,\
+                __ADD_BEFORE_EACH(LABEL)\
+                __ADD_AFTER_EACH(LABEL)\
+            };\
+            runTests(&info);\
+            if(info.status < 0) {\
+                TESTS_STD_PRINT("\x1B[1;31mFailed:\n");\
+                TESTS_STD_PRINT("    At %s:%d\n", __FILE__, info.failLine);\
+                TESTS_STD_PRINT("    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
+                if(info.expectText != NULL) {\
+                    TESTS_STD_PRINT("(%s)", info.expectText);\
+                }\
+                TESTS_STD_PRINT("\x1B[0m\n");\
+            }\
+    \
+            TESTS_STD_PRINT("\n\n");\
+            return 0;\
+        }\
+        void runTests(struct TESTS_infoType* TESTS_info)
+#endif
+
+#define IT(LABEL)\
+    if(TESTS_info->beforeEach != NULL) {\
+        TESTS_info->beforeEach();\
     }\
-    void runTests(struct TESTS_infoType* TESTS_info)
+    TESTS_info->testLabel = LABEL;\
+    TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n");\
+    for(int i = 0; i < 1; i += TESTS_info->afterEach ? (TESTS_info->afterEach(), 1) : 1)
 
 #define IT_TODO(LABEL)\
     TESTS_info->status = 0;\
     TESTS_STD_PRINT("\x1B[1;35mTODO: it "LABEL"\x1B[0m\n");
-
-#if defined(WITH_AFTER_EACH)
-    #define __IT(LABEL)\
-        TESTS_info->testLabel = LABEL;\
-        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n");\
-        for(int i = 0; i < 1; i += (Tests__internal__afterEach(), 1))
-#else 
-    #define __IT(LABEL)\
-        TESTS_info->testLabel = LABEL;\
-        TESTS_STD_PRINT("\x1B[1mit "LABEL"\x1B[0m\n");
-#endif // WITH_AFTER_EACH
-
-
-#if defined(WITH_BEFORE_EACH)
-    #define IT(LABEL)\
-        Tests__internal__beforeEach();\
-        __IT(LABEL)
-#else
-    #define IT(LABEL)\
-        __IT(LABEL)
-#endif // WITH_BEFORE_EACH
-
 
 #define EXPECT(VALUE)\
     {\
