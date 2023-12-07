@@ -76,6 +76,16 @@
         return NAME##__buffer + NAME##__length;\
     }\
 
+#define CREATE_PRINTF_LIKE_FUNCTION_SIGNATURES(NAME)\
+    extern char NAME##__buffer[];\
+    extern size_t NAME##__length;\
+    extern char* NAME##__lastString;\
+    extern size_t NAME##__lastStringLength;\
+    int NAME(const char* format, ...);\
+    void NAME##__reset(void);\
+    char* NAME##__nextString(void);\
+
+
 #define ADD_PRINTF_MOCK(BUFFER_LENGTH) CREATE_PRINTF_LIKE_FUNCTION(printf, BUFFER_LENGTH);
 
 

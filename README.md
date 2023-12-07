@@ -7,7 +7,7 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 |-----------------|-------------------------------------------------------------------------------------|----------------------------------------------------|
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)           | Provides TODO macro to make TODOs in code          |
-| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)         | Various macros for tests                           |
+| [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)         | Various macros for tests                           |
 
 # Defer
 Quick example:
@@ -159,6 +159,7 @@ DESCRIBE(math) {
  - [Test notes](#test-notes)
  - [Printf like functions](#printf-like-functions)
      - [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
+     - [CREATE_PRINTF_LIKE_FUNCTION_SIGNATURES](#create_printf_like_function_signatures)
      - [ADD_PRINTF_MOCK](#add_printf_mock)
  - [Overrides](#overrides)
 
@@ -357,6 +358,7 @@ To run multiple test files at once, you need to define **MULTI_TEST** before inc
 
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
+ - You do not need to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) if you are going to use only [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function) collection.
 
 ## Printf like functions
 [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) provides several macros to define **printf** like functions
@@ -371,7 +373,7 @@ List if defined variables/functions:
  - **__lastString** - pointer to the last written string
  - **__lastStringLength** - length of the last written length
  - **__reset()** - resets the buffer
- - **__nextString** - returns pointer to the next written content. Example:
+ - **__nextString()** - returns pointer to the next written content. Example:
     ```c
     #include "tests.h"
     CREATE_PRINTF_LIKE_FUNCTION(testPrint, 200);
@@ -386,6 +388,37 @@ List if defined variables/functions:
         return 0;
     }
     ```
+
+### CREATE_PRINTF_LIKE_FUNCTION_SIGNATURES
+Defines only signatures from [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
+```c
+// common.h
+#include "tests.h"
+
+CREATE_PRINTF_LIKE_FUNCTION_SIGNATURES(testPrint)
+void doSomething(void);
+
+
+// some-file.c
+#include "common.h"
+
+void doSomething(void) {
+    testPrint("text\n");
+}
+
+
+// main.c
+#include "common.h";
+
+CREATE_PRINTF_LIKE_FUNCTION(testPrint, 200)
+
+int main(void) {
+    doSomething();
+    testPrint("another text\n");
+
+    return 0;
+}
+```
 
 ### ADD_PRINTF_MOCK
 **ADD_PRINTF_MOCK** macro creates function **printf** identical to stdio's signature that writes into created buffer. 
