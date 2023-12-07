@@ -8,7 +8,6 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 | [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)           | Provides TODO macro to make TODOs in code          |
 | [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)         | Various macros for tests                           |
-| [Tests](#tests) | [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) | File required for tests                            |
 
 # Defer
 Quick example:
@@ -157,6 +156,7 @@ DESCRIBE(math) {
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
  - [Multiple test files](#multiple-test-files)
+ - [Test notes](#test-notes)
  - [Printf like functions](#printf-like-functions)
      - [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
      - [ADD_PRINTF_MOCK](#add_printf_mock)
@@ -354,6 +354,9 @@ Quick example:
 RUN_TESTS(test1, test2)
 ```
 To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
+
+## Test notes
+ - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
 
 ## Printf like functions
 [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) provides several macros to define **printf** like functions
