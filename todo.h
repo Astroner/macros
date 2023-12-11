@@ -13,9 +13,9 @@
 */
 #define TODO(...)\
     do {\
-        printf("Reached TODO at "__FILE__":"TODO_STR(__LINE__)"\n");\
+        printf("\x1B[1;33mReached TODO at "__FILE__":"TODO_STR(__LINE__)"\n");\
         printf(__VA_ARGS__);\
-        putchar('\n');\
+        printf("\x1B[0m\n");\
         exit(1);\
     } while(0);\
 
