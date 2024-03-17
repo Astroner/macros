@@ -357,6 +357,27 @@ DESCRIBE(AFTER_EACH_SHOWCASE) {
 ## Multiple test files
 Quick example:
 ```c
+// test1.c
+#include "tests-new.h"
+#include "tests.h"
+
+DESCRIBE(test1) {
+    IT("works") {
+        EXPECT(1) TO_BE_TRUTHY;
+    }
+}
+
+// test2.c
+#include "tests-new.h"
+#include "tests.h"
+
+DESCRIBE(test2) {
+    IT("works") {
+        EXPECT(1) TO_BE_TRUTHY;
+    }
+}
+
+// main-test.c
 #include "tests-new.h"
 
 #define MULTI_TEST
@@ -372,7 +393,7 @@ To run multiple test files at once, you need to define **MULTI_TEST** before inc
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
  - You do not need to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) if you are going to use only [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function) collection.
- - Test macros are designed to be executed one by one and with **MULTI_TEST** feature enabled.
+ - Test macros are designed to be executed one by one or with **MULTI_TEST** feature enabled.
 
 ## Printf like functions
 [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) provides several macros to define **printf** like functions
