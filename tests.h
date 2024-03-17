@@ -213,7 +213,7 @@
     };\
 
 #define TO_BE_FALSY\
-        if((!localPassedValue) ^ TESTS_info->isNot) {\
+        if((!!localPassedValue) ^ TESTS_info->isNot) {\
             TESTS_info->status = -1;\
             TESTS_info->expectText = NULL;\
             TESTS_info->operatorText = "TO_BE_FALSY";\
