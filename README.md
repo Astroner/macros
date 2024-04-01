@@ -152,6 +152,7 @@ DESCRIBE(math) {
      - [TO_BE_STRING](#to_be_string)
      - [TO_BE_NULL](#to_be_null)
      - [TO_HAVE_BYTES](#to_have_bytes)
+     - [TO_HAVE_RAW_BYTES](#to_have_raw_bytes)
  - [Test suit hooks](#test-suit-hooks)
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
