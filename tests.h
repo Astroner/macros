@@ -247,4 +247,14 @@
         EXPECTED(#BYTES", "#LENGTH)\
     )
 
+#define TO_HAVE_RAW_BYTES(BYTE, ...)\
+    CREATE_MATCHER(TO_HAVE_RAW_BYTES,\
+        unsigned char buffer[] = { BYTE, __VA_ARGS__ };\
+        for(size_t i = 0; i < sizeof(buffer); i++) {\
+            MATCHER_CONDITION(PASSES_IF(buffer[i] == MATCHER_VALUE[i])) {\
+                printf("Got bytes mismatch at position %zu. Expected: %d, Got: %d\n", i, buffer[i], MATCHER_VALUE[i]);\
+                MATCHER_FAIL("{ "#BYTE", "#__VA_ARGS__" }")\
+            }\
+        }\
+    )
 #endif // TESTS_H

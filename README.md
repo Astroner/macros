@@ -301,6 +301,21 @@ DESCRIBE(charArrays) {
 }
 ```
 
+### TO_HAVE_RAW_BYTES
+Assumes that provided value is a pointer and compares it with provided bytes.
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+DESCRIBE(charsArrays) {
+    IT("it matches the buffer") {
+        char* str = "ab";
+
+        EXPECT(str) TO_HAVE_RAW_BYTES('a', 'b', '\0');
+    }
+}
+```
+
 ## Test suit hooks
 This section describes macros to add actions before/after each test.
 
