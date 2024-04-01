@@ -156,6 +156,9 @@ DESCRIBE(math) {
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
  - [Multiple test files](#multiple-test-files)
+ - [Creating new matchers](#creating-new-matcher)
+     - [CREATE_MATCHER_S](#create_matcher_s)
+     - [CREATE_MATCHER](#create_matcher)
  - [Test notes](#test-notes)
  - [Printf like functions](#printf-like-functions)
      - [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
@@ -389,6 +392,128 @@ DESCRIBE(test2) {
 RUN_TESTS(test1, test2)
 ```
 To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
+
+## Creating new matchers
+To create new matcher the library provides **CREATE_MATCHER** and **CREATE_MATCHER_S** macro.
+Quick example
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+#define TO_BE_2 CREATE_MATCHER_S(TO_BE_2, PASSES_IF(MATCHER_VALUE == 2), NO_EXPECTED)
+
+DESCRIBE(custom_matcher) {
+    IT("works") {
+        EXPECT(2) TO_BE_2
+    }
+}
+// stdout:
+// Describing 'custom_matcher'
+// it works
+// Failed:
+//     At main.c:8
+//     EXPECT(3) TO_BE_2
+
+```
+### CREATE_MATCHER_S
+Generally, **CREATE_MATCHER_S** is for simple matcher with a simple condition
+```c
+#define CREATE_MATCHER_S(MATCHER_NAME, CONDITION, EXPECTED_TEXT)
+```
+ - **MATCHER_NAME** - new matcher
+ - **CONDITION** - matcher condition wrapped with **PASSES_IF** or **FAILS_IF**
+ - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro. If expected value is not necessary like in the example above, **NO_EXPECTED** macro can be passed
+
+Value that was passed to **EXPECT** can be accessed with **MATCHER_VALUE** macro.
+
+### CREATE_MATCHER
+If matcher logic is more complicated and requires more workarounds with the value **CREATE_MATCHER** can be used.
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+#define TO_BE_1000_WITH(VALUE)\
+    CREATE_MATCHER(TO_BE_1000_WITH,\
+        int value = MATCHER_VALUE + VALUE;\
+        MATCHER_CONDITION_S(PASSES_IF(value == 1000), EXPECTED("1000 - "#VALUE));\
+    )
+
+DESCRIBE(custom_matcher) {
+    IT("works") {
+        EXPECT(20) TO_BE_1000_WITH(1);
+    }
+}
+
+// stdout:
+// Describing 'custom_matcher'
+// it works
+// Failed:
+//     At main.c:12
+//     EXPECT(20) TO_BE_1000_WITH(1000 - 1)
+```
+Unlike **CREATE_MATCHER_S** **CREATE_MATCHER** can work with provided code
+```c
+#define CREATE_MATCHER(MATCHER_NAME, ...)
+```
+ - **MATCHER_NAME** - new matcher
+ - **VARIADIC ARGUMENTS** - matcher body
+
+In the example we use **MATCHER_CONDITION_S** macro to fulfill matcher condition
+```c
+#define MATCHER_CONDITION_S(CONDITION, EXPECTED_TEXT)
+```
+ - **CONDITION** - matcher condition wrapped with **PASSES_IF** or **FAILS_IF**
+ - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro. If expected value is not necessary like in the example above, **NO_EXPECTED** macro can be passed
+
+But if more workaround is required **MATCHER_CONDITION** macro can be used instead:
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+#include "stdlib.h"
+
+#define TO_BE_1000_WITH(VALUE)\
+    CREATE_MATCHER(TO_BE_1000_WITH,\
+        int value = MATCHER_VALUE + VALUE;\
+        void* mem = malloc(1000);\
+        int passed;\
+        MATCHER_CONDITION(PASSES_IF(value == 1000)) {\
+            passed = 0;\
+            printf("= Test failed =\n");\
+        } else {\
+            passed = 1;\
+        }\
+        free(mem);\
+        if(!passed) {\
+            MATCHER_FAIL(EXPECTED("1000 - "#VALUE));\
+        }\
+    )
+
+DESCRIBE(custom_matcher) {
+    IT("works") {
+        EXPECT(20) TO_BE_1000_WITH(1);
+    }
+}
+// stdout:
+// Describing 'custom_matcher'
+// it works
+// = Test failed =
+// Failed:
+//     At main.c:17
+//     EXPECT(20) TO_BE_1000_WITH(1000 - 1)
+```
+In this example we can allocate some memory during matching process and free it at the end.
+**MATCHER_CONDITION** works as a simple **if** statement and the first code block will be executed if the condition failed.
+```c
+#define MATCHER_CONDITION(CONDITION)
+```
+ - **CONDITION** - matcher condition wrapped with **PASSES_IF** or **FAILS_IF**
+
+**MATCHER_FAIL** macro fails the matcher
+```c
+#define MATCHER_FAIL(EXPECTED_TEXT)
+```
+ - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro. If expected value is not necessary like in the example above, **NO_EXPECTED** macro can be passed
 
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
