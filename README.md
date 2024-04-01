@@ -463,7 +463,7 @@ In the example we use **MATCHER_CONDITION_S** macro to fulfill matcher condition
 #define MATCHER_CONDITION_S(CONDITION, EXPECTED_TEXT)
 ```
  - **CONDITION** - matcher condition wrapped with **PASSES_IF** or **FAILS_IF**
- - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro. If expected value is not necessary like in the example above, **NO_EXPECTED** macro can be passed
+ - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro or **NO_EXPECTED**;
 
 But if more workaround is required **MATCHER_CONDITION** macro can be used instead:
 ```c
@@ -503,7 +503,7 @@ DESCRIBE(custom_matcher) {
 //     EXPECT(20) TO_BE_1000_WITH(1000 - 1)
 ```
 In this example we can allocate some memory during matching process and free it at the end.
-**MATCHER_CONDITION** works as a simple **if** statement and the first code block will be executed if the condition failed.
+**MATCHER_CONDITION** works as a simple **if** statement and the first code block will be executed if the condition fails.
 ```c
 #define MATCHER_CONDITION(CONDITION)
 ```
@@ -513,7 +513,7 @@ In this example we can allocate some memory during matching process and free it 
 ```c
 #define MATCHER_FAIL(EXPECTED_TEXT)
 ```
- - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro. If expected value is not necessary like in the example above, **NO_EXPECTED** macro can be passed
+ - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro or **NO_EXPECTED**.
 
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
