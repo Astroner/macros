@@ -404,7 +404,7 @@ Quick example
 
 DESCRIBE(custom_matcher) {
     IT("works") {
-        EXPECT(2) TO_BE_2
+        EXPECT(3) TO_BE_2
     }
 }
 // stdout:
