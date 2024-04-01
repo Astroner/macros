@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
 }
 ```
 
+## DEFER
 **DEFER** macro here helps to manage opened file. When the code block ends, **fclose(f)** will be called automatically.
 In cases when you want to *exit* **DEFER** statement by yourself, in case of error for example, use **DEFER_EXIT** macro:
 ```c
@@ -94,6 +95,42 @@ int main(int argc, char** argv) {
 **DEFER_BREAK** does not trigger cleanup, so you have to do it by yourself in certain cases.
 
 > Note, that DEFER works via **for** statement, so it is impossible to **DEFER_EXIT** or **DEFER_BEAK** from nested loops or switch
+
+## DEFER_MANY
+Use **DEFER_MANY** macro to manage more than one resource:
+```c
+#include <stdio.h>
+#include "defer.h"
+
+int main() {
+    DEFER_MANY(
+        DEFER_RESOURCES(
+            FILE* first;
+            FILE* second;
+        ),
+        DEFER_INIT(
+            DEFER_I.first = fopen("example_1.txt"),
+            DEFER_I.second = fopen("example_1.txt"),
+        ),
+        DEFER_CLEANUP(
+            fclose(DEFER_R.first),
+            fclose(DEFER_R.second),
+        )
+    ) {
+        int f = getc(DEFER_R.first);
+        int s = getc(DEFER_R.second);
+
+        printf("%d, %d\n", f, s);
+    }
+}
+```
+
+**DEFER_MANY** accepts 3 other macros:
+ - **DEFER_RESOURCES** - defines resources to use divided by **";"**.
+ - **DEFER_INIT** - defines resource initialization. During initialization resources are accessed with **DEFER_I** macro. Each statement must be terminated by **","**.
+ - **DEFER_CLEANUP** - defines cleanup. Each statement must be terminated by **","**. Initialized resources can be accessed with **DEFER_R** macro.
+
+Then you can use initialized resources with **DEFER_R** macro.
 
 # TODO
 Quick example:
