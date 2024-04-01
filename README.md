@@ -156,7 +156,7 @@ DESCRIBE(math) {
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
  - [Multiple test files](#multiple-test-files)
- - [Creating new matchers](#creating-new-matcher)
+ - [Creating new matchers](#creating-new-matchers)
      - [CREATE_MATCHER_S](#create_matcher_s)
      - [CREATE_MATCHER](#create_matcher)
  - [Test notes](#test-notes)
@@ -394,7 +394,7 @@ RUN_TESTS(test1, test2)
 To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
 
 ## Creating new matchers
-To create new matcher the library provides **CREATE_MATCHER** and **CREATE_MATCHER_S** macro.
+To create new matcher the library provides **CREATE_MATCHER** and **CREATE_MATCHER_S** macros.
 Quick example
 ```c
 #include "tests-new.h"
