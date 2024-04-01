@@ -132,6 +132,8 @@ int main() {
 
 Then you can use initialized resources with **DEFER_R** macro.
 
+**DEFER_BREAK** and **DEFER_EXIT** work the same as with **DEFER**
+
 # TODO
 Quick example:
 ```c
