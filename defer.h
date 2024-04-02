@@ -9,10 +9,9 @@
 #define DEFER_BREAK break;
 
 // Defining resources
-#define DEFER_RESOURCES(RESOURCE, ...)\
+#define DEFER_RESOURCES(...)\
     struct {\
         int __flag;\
-        RESOURCE;\
         __VA_ARGS__\
     } RAW_RES_DEFER
 
@@ -23,16 +22,15 @@
 #define DEFER_R RAW_RES_DEFER
 
 // Resources initialization
-#define DEFER_INIT(STATEMENT, ...)\
+#define DEFER_INIT(...)\
     {\
         .__flag = 1,\
-        STATEMENT,\
         __VA_ARGS__\
     }
 
 // Resources cleanup
-#define DEFER_CLEANUP(STATEMENT, ...)\
-    (STATEMENT, __VA_ARGS__ 0)
+#define DEFER_CLEANUP(...)\
+    (__VA_ARGS__ 0)
 
 // DEFER for many resources
 #define DEFER_MANY(RESOURCES, INIT, CLEANUP)\
