@@ -5,11 +5,15 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 
 | Name            | Link                                                                                | Description                                        |
 |-----------------|-------------------------------------------------------------------------------------|----------------------------------------------------|
-| [Defer](#defer) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
+| [Defer](#defer-functions) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)           | Provides TODO macro to make TODOs in code          |
 | [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)         | Various macros for tests                           |
 
-# Defer
+# Defer functions
+ - [DEFER](#defer)
+ - [DEFER_SIMPLE](#defer_simple)
+ - [DEFER_MANY](#defer_many)
+
 Quick example:
 ```c
 #include <stdio.h>
@@ -95,6 +99,20 @@ int main(int argc, char** argv) {
 **DEFER_BREAK** does not trigger cleanup, so you have to do it by yourself in certain cases.
 
 > Note, that DEFER works via **for** statement, so it is impossible to **DEFER_EXIT** or **DEFER_BEAK** from nested loops or switch
+
+## DEFER_SIMPLE
+**DEFER_SIMPLE** can be used if the resource does not require variable definitions(library initialization functions for example)
+```c
+#include <some-library.h>
+
+#include "defer.h"
+
+int main(void) {
+    DEFER_SIMPLE(Library_INIT(), Library_QUIT()) {
+        // ...code
+    }
+}
+```
 
 ## DEFER_MANY
 Use **DEFER_MANY** macro to manage more than one resource:

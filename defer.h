@@ -8,6 +8,9 @@
 // EXIT DEFER with no cleanup
 #define DEFER_BREAK break;
 
+#define DEFER_SIMPLE(START, END)\
+    for(int i = ((START), 0); i < 1; i += (END, 1))
+
 // Defining resources
 #define DEFER_RESOURCES(...)\
     struct {\
