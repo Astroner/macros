@@ -526,10 +526,10 @@ DESCRIBE(custom_matcher) {
 
 // stdout:
 // Describing 'custom_matcher'
-// it works
-// Failed:
-//     At main.c:12
-//     EXPECT(20) TO_BE_1000_WITH(1000 - 1)
+//     it works
+//     Failed:
+//         At main.c:12
+//         EXPECT(20) TO_BE_1000_WITH(1000 - 1)
 ```
 Unlike **CREATE_MATCHER_S** **CREATE_MATCHER** can work with provided code
 ```c
@@ -559,7 +559,7 @@ But if more workaround is required **MATCHER_CONDITION** macro can be used inste
         int passed;\
         MATCHER_CONDITION(PASSES_IF(value == 1000)) {\
             passed = 0;\
-            printf("= Test failed =\n");\
+            MATCHER_INFO("= Test failed =");\
         } else {\
             passed = 1;\
         }\
@@ -576,11 +576,11 @@ DESCRIBE(custom_matcher) {
 }
 // stdout:
 // Describing 'custom_matcher'
-// it works
-// = Test failed =
-// Failed:
-//     At main.c:17
-//     EXPECT(20) TO_BE_1000_WITH(1000 - 1)
+//     it works
+//     [INFO] = Test failed =
+//     Failed:
+//         At main.c:25
+//         EXPECT(20) TO_BE_1000_WITH    (1000 - 1)
 ```
 In this example we can allocate some memory during matching process and free it at the end.
 **MATCHER_CONDITION** works as a simple **if** statement and the first code block will be executed if the condition fails.
@@ -594,6 +594,8 @@ In this example we can allocate some memory during matching process and free it 
 #define MATCHER_FAIL(EXPECTED_TEXT)
 ```
  - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro or **NO_EXPECTED**.
+
+To output some additional info you can use macro **MATCHER_INFO**, which has the same format as the **printf** function, but with an automatic newline at the end.
 
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
