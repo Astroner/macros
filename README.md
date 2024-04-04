@@ -196,8 +196,8 @@ DESCRIBE(math) {
     }
 }
 // Describing 'math'
-// it sums
-// it multiplies
+//     it sums
+//     it multiplies
 ```
 
 ## Content
@@ -251,7 +251,7 @@ DESCRIBE(math) {
 }
 
 // Describing 'math'
-// TODO: it works
+//     TODO: it works
 ```
 
 ## Matchers
@@ -463,6 +463,13 @@ DESCRIBE(test2) {
 #include "test2.c"
 
 RUN_TESTS(test1, test2)
+
+// stdout:
+// Describing 'test1'
+//     it works
+//
+// Describing 'test2'
+//     it works
 ```
 To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
 
@@ -482,10 +489,10 @@ DESCRIBE(custom_matcher) {
 }
 // stdout:
 // Describing 'custom_matcher'
-// it works
-// Failed:
-//     At main.c:8
-//     EXPECT(3) TO_BE_2
+//     it works
+//     Failed:
+//         At main.c:8
+//         EXPECT(3) TO_BE_2
 
 ```
 ### CREATE_MATCHER_S
@@ -592,6 +599,7 @@ In this example we can allocate some memory during matching process and free it 
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)
  - You do not need to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) if you are going to use only [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function) collection.
  - Test macros are designed to be executed one by one or with **MULTI_TEST** feature enabled.
+ - You can change tests output tab width by defining **TESTS_PRINT_TAB_WIDTH** macro with specified number of spaces(by default it is 4) before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h)
 
 ## Printf like functions
 [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) provides several macros to define **printf** like functions
