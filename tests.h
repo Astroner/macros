@@ -33,7 +33,7 @@
 #endif // TESTS_PRINT
 
 #define TESTS_STD_SP_PRINT(SPACES, ...)\
-    for(int S_COUNTER = 0; S_COUNTER < SPACES; S_COUNTER++) TESTS_STD_PRINT(" ");\
+    for(int S_COUNTER = 0; S_COUNTER < (SPACES); S_COUNTER++) TESTS_STD_PRINT(" ");\
     TESTS_STD_PRINT(__VA_ARGS__);\
 
 #if !defined(TESTS_STD_STRLEN)
@@ -128,12 +128,12 @@
             LABEL##__runTests(&info);\
             if(info.status < 0) {\
                 TESTS_STD_SP_PRINT(localSpaces, "\x1B[1;31mFailed:\n");\
-                TESTS_STD_SP_PRINT(localSpaces, "    At %s:%d\n", __FILE__, info.failLine);\
-                TESTS_STD_SP_PRINT(localSpaces, "    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
+                TESTS_STD_SP_PRINT(localSpaces + TESTS_PRINT_TAB_WIDTH, "At %s:%d\n", __FILE__, info.failLine);\
+                TESTS_STD_SP_PRINT(localSpaces + TESTS_PRINT_TAB_WIDTH, "EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
                 if(info.expectText != NULL) {\
-                    TESTS_STD_SP_PRINT(localSpaces, "(%s)", info.expectText);\
+                    TESTS_STD_PRINT("(%s)", info.expectText);\
                 }\
-                TESTS_STD_SP_PRINT(localSpaces, "\x1B[0m\n");\
+                TESTS_STD_PRINT("\x1B[0m\n");\
 \
                 return 1;\
             }\
@@ -169,12 +169,12 @@
             runTests(&info);\
             if(info.status < 0) {\
                 TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH, "\x1B[1;31mFailed:\n");\
-                TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH, "    At %s:%d\n", __FILE__, info.failLine);\
-                TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH, "    EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
+                TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH * 2, "At %s:%d\n", __FILE__, info.failLine);\
+                TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH * 2, "EXPECT(%s)%s%s", info.testText, info.isNot ? " NOT " : " ", info.operatorText);\
                 if(info.expectText != NULL) {\
-                    TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH, "(%s)", info.expectText);\
+                    TESTS_STD_PRINT("(%s)", info.expectText);\
                 }\
-                TESTS_STD_SP_PRINT(TESTS_PRINT_TAB_WIDTH, "\x1B[0m\n\n\n");\
+                TESTS_STD_PRINT("\x1B[0m\n\n\n");\
                 return 1;\
             }\
     \
