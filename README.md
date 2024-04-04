@@ -545,7 +545,7 @@ In the example we use **MATCHER_CONDITION_S** macro to fulfill matcher condition
  - **CONDITION** - matcher condition wrapped with **PASSES_IF** or **FAILS_IF**
  - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro or **NO_EXPECTED**;
 
-But if more workaround is required **MATCHER_CONDITION** macro can be used instead:
+But if even more workaround is required **MATCHER_CONDITION** macro can be used instead:
 ```c
 #include "tests-new.h"
 #include "tests.h"
