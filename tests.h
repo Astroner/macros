@@ -142,6 +142,21 @@
         }\
         void LABEL##__runTests(struct TESTS_infoType* TESTS_info)
     
+    #define DESCRIBE_MERGE(LABEL, ...)\
+        int LABEL(int spaces) {\
+            typedef int TestSuit(int spaces);\
+            TestSuit* suits[] = { __VA_ARGS__ };\
+            int status = 0;\
+            TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+            int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
+            for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                if(suits[i](localSpaces) == 1) status = 1;\
+                TESTS_STD_PRINT("\n");\
+            }\
+            TESTS_STD_PRINT("\n\n");\
+            return status;\
+        }
+
     #define RUN_TESTS(...)\
         int main(void) {\
             typedef int TestSuit(int spaces);\
@@ -223,10 +238,11 @@
 
 #define EXPECTED(string) string
 #define NO_EXPECTED NULL
-#define MATCHER_FAIL(EXPECTED_TEXT)\
+#define MATCHER_FAIL(EXPECTED_TEXT) {\
     TESTS_info->status = -1;\
     TESTS_info->expectText = EXPECTED_TEXT;\
     return;\
+}
 
 #define MATHER_IS_NOT TESTS_info->isNot
 
