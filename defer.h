@@ -1,6 +1,6 @@
 #if !defined(DEFER)
 
-#define DEFER(start, end) for(start, *i = (void*)0x0; i != (void*)0x1; i = (end, (void*)0x1)) 
+#define DEFER(start, end) for(start, *defer_INTERNAL = (void*)0x0; defer_INTERNAL != (void*)0x1; defer_INTERNAL = (end, (void*)0x1)) 
 
 // Exit DEFER and run cleanup
 #define DEFER_EXIT continue;
@@ -9,7 +9,7 @@
 #define DEFER_BREAK break;
 
 #define DEFER_SIMPLE(START, END)\
-    for(int i = ((START), 0); i < 1; i += (END, 1))
+    for(int defer_INTERNAL = ((START), 0); defer_INTERNAL < 1; defer_INTERNAL += (END, 1))
 
 // Defining resources
 #define DEFER_RESOURCES(...)\
