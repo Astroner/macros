@@ -7,6 +7,7 @@ File [macros.h](https://raw.githubusercontent.com/Astroner/macros/master/macros.
 |-----------------|-------------------------------------------------------------------------------------|----------------------------------------------------|
 | [Defer](#defer-functions) | [defer.h](https://raw.githubusercontent.com/Astroner/macros/master/defer.h)         | Provides DEFER macro to manage temporal resources such as memory, files and e.t.c. |
 | [TODO](#todo)   | [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/todo.h)           | Provides TODO macro to make TODOs in code          |
+| [Ancipe](#ancipe)| [todo.h](https://raw.githubusercontent.com/Astroner/macros/master/ancipe.h)        | Stdout coloring lib                                |
 | [Tests](#tests) | [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)         | Various macros for tests                           |
 
 # Defer functions
@@ -180,6 +181,74 @@ int main(void) {
 }
 ```
 
+# Ancipe
+Quick example:
+```c
+#include "ancipe.h"
+
+int main(void) {
+    acp(ACP_BLACK ACP_BG_WHITE, "Hello, world!");
+
+    return 0;
+}
+```
+
+**acp()** macro will print **"Hello, world!"** in black text(**ACP_BLACK**) on a white background(**ACP_BG_WHITE**).
+**acp()** has the following declaration:
+```c
+#define acp(colors, format, ...)
+```
+ - **colors** - is stdout color configuration. Special **ACP_** prefixed constants divided by space.
+ - **format** - format string
+ - **...rest** - formatting arguments
+
+Basically, **acp()** macro works the same with **printf()** except it requires coloring format as the first argument and adds a new line after.
+> **acps()** macro does the same, but without a new line
+
+**coloring format** consists of [text color](#text-color-list), [background color](#background-color-list) and [text style](#text-style-list). All of them are optional, but at least one parameter should be presented:
+```c
+acp(ACP_RED ACP_BOLD ACP_BG_WHITE, "Correct format");
+acp(ACP_BOLD, "Also correct format");
+acp("Incorrect format");
+```
+
+## Text color list
+ - **ACP_BLACK**
+ - **ACP_RED**
+ - **ACP_GREEN**
+ - **ACP_YELLOW**
+ - **ACP_BLUE**
+ - **ACP_MAGENTA**
+ - **ACP_CYAN**
+ - **ACP_WHITE**
+
+## Background color list
+ - **ACP_BG_RED**     
+ - **ACP_BG_GREEN**   
+ - **ACP_BG_YELLOW**  
+ - **ACP_BG_BLUE**    
+ - **ACP_BG_MAGENTA** 
+ - **ACP_BG_CYAN**    
+ - **ACP_BG_WHITE**   
+
+## Text style list
+ - **ACP_NORMAL**    
+ - **ACP_BOLD**      
+ - **ACP_UNDERLINE** 
+ - **ACP_REVERSED**  
+
+## Miscs
+ - **acp_err()**, **acp_info()**, **acp_success()** cover general logging
+ - Output can be disabled by defining **ACP_DISABLE** macro before **include** statement
+ - Output dest can be overridden by defining **ACP_STD_PRINTF** macro before **include** statement
+ - *ancipe* is pronounced as *an-see-pee*
+     - The name comes from german word "anstreichen"
+     - *an-s-treichen*
+     - *an-C-treichen*
+     - *treichen* can be translated into english as verb "to pet"
+     - *an-C-pet*
+     - *an-C-pe*
+     - *ancipe*
 # Tests 
 Quick example:
 ```c
