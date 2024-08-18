@@ -282,6 +282,7 @@ DESCRIBE(math) {
  - [Test suit hooks](#test-suit-hooks)
      - [BEFORE_EACH](#before_each)
      - [AFTER_EACH](#after_each)
+ - [Merging test suits](#merging-test-suits)
  - [Multiple test files](#multiple-test-files)
  - [Creating new matchers](#creating-new-matchers)
      - [CREATE_MATCHER_S](#create_matcher_s)
@@ -295,7 +296,7 @@ DESCRIBE(math) {
 
 ## Test file structure
 Each test file should begin with inclusion of [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h) to do some macro preparations, only then [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h) should be included.
-Test starts with **DESCRIBE** macro, which initiates everything with provided label including main function. There can only be one **DESCRIBE** per program if **MULTI_TEST** is not defined([More about multiple test files](#multiple-test-files)). **DESCRIBE** macro accepts test suit identifier/name.
+Test starts with **DESCRIBE** macro, which initiates everything with provided label including main function. There can only be one **DESCRIBE** per program unless **MULTI_TEST**([More about multiple test files](#multiple-test-files)) or **WITH_DESCRIBE_MERGE**([more about merging test suits](#merging-test-suits)) are defined. **DESCRIBE** macro accepts test suit identifier/name.
 **DESCRIBE** contains **IT** statements, actually describing test cases.
 Then goes **EXPECT** with matchers. So the general structure looks like this:
 ```c
@@ -497,6 +498,75 @@ DESCRIBE(AFTER_EACH_SHOWCASE) {
         EXPECT(result) TO_BE(2)
     }
 }
+```
+
+## Merging test suits
+Quick example:
+```c
+#include "tests-new.h"
+
+#define WITH_DESCRIBE_MERGE
+#include "tests.h"
+
+DESCRIBE(sub_module_1) {
+    // tests for the sub module
+}
+
+DESCRIBE(sub_module_2) {
+    // tests for the sub module
+}
+
+DESCRIBE_MERGE(module, sub_module_1, sub_module_2)
+
+// Describing 'module'
+//    Describing 'sub_module_1'
+//        ...
+//    
+//    Describing 'sub_module_2'
+//        ...
+```
+
+Essentially, **DESCRIBE_MERGE** does what the name says, it merges multiple describe statements into one.
+
+Additionally, **DESCRIBE_MERGE** allows test file split if it is required due to tests size.
+```c
+// sub_module_1.spec.c
+#include "tests-new.h"
+
+#include "tests.h"
+
+DESCRIBE(sub_module_1) {
+    IT_TODO("works");
+}
+
+
+// sub_module_2.spec.c
+#include "tests-new.h"
+
+#include "tests.h"
+
+DESCRIBE(sub_module_2) {
+    IT_TODO("works");
+}
+
+// module.spec.c
+#include "tests-new.h"
+
+#define WITH_DESCRIBE_MERGE
+#include "tests.h"
+
+#include "sub_module_1.spec.c"
+#include "sub_module_2.spec.c"
+
+DESCRIBE_MERGE(module, sub_module_1, sub_module_2)
+
+
+// Describing 'module'
+//     Describing 'sub_module_1'
+//         TODO: it works
+
+//     Describing 'sub_module_2'
+//         TODO: it works
 ```
 
 ## Multiple test files

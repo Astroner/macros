@@ -120,7 +120,7 @@
 #endif
 
 #define acp_err(...) acp(ACP_RED ACP_BOLD, __VA_ARGS__)
-#define acp_info(...) acp(ACP_GREEN ACP_BOLD, __VA_ARGS__)
-#define acp_success(...) acp(ACP_YELLOW ACP_BOLD, __VA_ARGS__)
+#define acp_info(...) acp(ACP_YELLOW ACP_BOLD, __VA_ARGS__)
+#define acp_success(...) acp(ACP_GREEN ACP_BOLD, __VA_ARGS__)
 
 #endif // ANCIPE_H

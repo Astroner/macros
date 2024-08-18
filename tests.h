@@ -113,7 +113,39 @@
     #define __ADD_AFTER_EACH(LABEL) .afterEach = NULL,
 #endif // WITH_AFTER_EACH
 
-#if defined(MULTI_TEST)
+#if defined(WITH_DESCRIBE_MERGE)
+    #if defined(MULTI_TEST)
+        #define DESCRIBE_MERGE(LABEL, ...)\
+            int LABEL(int spaces) {\
+                typedef int TestSuit(int spaces);\
+                TestSuit* suits[] = { __VA_ARGS__ };\
+                int status = 0;\
+                TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+                int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
+                for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                    if(suits[i](localSpaces) == 1) status = 1;\
+                }\
+                return status;\
+            }
+    #else
+        #define DESCRIBE_MERGE(LABEL, ...)\
+            int main(int spaces) {\
+                typedef int TestSuit(int spaces);\
+                TestSuit* suits[] = { __VA_ARGS__ };\
+                int status = 0;\
+                TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+                int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
+                for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                    if(suits[i](localSpaces) == 1) status = 1;\
+                    TESTS_STD_PRINT("\n");\
+                }\
+                TESTS_STD_PRINT("\n\n");\
+                return status;\
+            }
+    #endif
+#endif
+
+#if defined(MULTI_TEST) || defined(WITH_DESCRIBE_MERGE)
     #define DESCRIBE(LABEL) \
         void LABEL##__runTests(struct TESTS_infoType* TESTS_info);\
         int LABEL(int spaces) {\
@@ -141,35 +173,6 @@
             return 0;\
         }\
         void LABEL##__runTests(struct TESTS_infoType* TESTS_info)
-    
-    #define DESCRIBE_MERGE(LABEL, ...)\
-        int LABEL(int spaces) {\
-            typedef int TestSuit(int spaces);\
-            TestSuit* suits[] = { __VA_ARGS__ };\
-            int status = 0;\
-            TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
-            int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
-            for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
-                if(suits[i](localSpaces) == 1) status = 1;\
-                TESTS_STD_PRINT("\n");\
-            }\
-            TESTS_STD_PRINT("\n\n");\
-            return status;\
-        }
-
-    #define RUN_TESTS(...)\
-        int main(void) {\
-            typedef int TestSuit(int spaces);\
-            TestSuit* suits[] = { __VA_ARGS__ };\
-            int status = 0;\
-            TESTS_STD_PRINT("\n\n");\
-            for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
-                if(suits[i](0) == 1) status = 1;\
-                TESTS_STD_PRINT("\n");\
-            }\
-            TESTS_STD_PRINT("\n\n");\
-            return status;\
-        }
 #else
     #define DESCRIBE(LABEL) \
         void runTests(struct TESTS_infoType* TESTS_info);\
@@ -197,6 +200,22 @@
             return 0;\
         }\
         void runTests(struct TESTS_infoType* TESTS_info)
+#endif
+
+#if defined(MULTI_TEST)
+    #define RUN_TESTS(...)\
+        int main(void) {\
+            typedef int TestSuit(int spaces);\
+            TestSuit* suits[] = { __VA_ARGS__ };\
+            int status = 0;\
+            TESTS_STD_PRINT("\n\n");\
+            for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                if(suits[i](0) == 1) status = 1;\
+                TESTS_STD_PRINT("\n");\
+            }\
+            TESTS_STD_PRINT("\n\n");\
+            return status;\
+        }
 #endif
 
 #define IT(LABEL)\
