@@ -123,6 +123,7 @@
                 TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
                 int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
                 for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
+                    if(i != 0) TESTS_STD_PRINT("\n");\
                     if(suits[i](localSpaces) == 1) status = 1;\
                 }\
                 return status;\
