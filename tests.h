@@ -130,14 +130,13 @@
             }
     #else
         #define DESCRIBE_MERGE(LABEL, ...)\
-            int main(int spaces) {\
+            int main(void) {\
                 typedef int TestSuit(int spaces);\
                 TestSuit* suits[] = { __VA_ARGS__ };\
                 int status = 0;\
-                TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
-                int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
+                TESTS_STD_SP_PRINT(0, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
                 for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
-                    if(suits[i](localSpaces) == 1) status = 1;\
+                    if(suits[i](TESTS_PRINT_TAB_WIDTH) == 1) status = 1;\
                     TESTS_STD_PRINT("\n");\
                 }\
                 TESTS_STD_PRINT("\n\n");\
