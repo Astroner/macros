@@ -287,6 +287,7 @@ DESCRIBE(math) {
  - [Creating new matchers](#creating-new-matchers)
      - [CREATE_MATCHER_S](#create_matcher_s)
      - [CREATE_MATCHER](#create_matcher)
+     - [EXPECT_M](#expect_m)
  - [Test notes](#test-notes)
  - [Printf like functions](#printf-like-functions)
      - [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function)
@@ -735,6 +736,62 @@ In this example we can allocate some memory during matching process and free it 
  - **EXPECTED_TEXT** - expected value in a form of string wrapped with **EXPECTED** macro or **NO_EXPECTED**.
 
 To output some additional info you can use macro **MATCHER_INFO**, which has the same format as the **printf** function, but with an automatic newline at the end.
+
+### EXPECT_M
+**EXPECT_M** is required to test more complex data structures.
+It provides an interface for setting up custom matcher values (like a and b in the example below) that custom matchers can access.
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+#define TO_HAVE_SUM(VALUE)\
+    CREATE_MATCHER_S(TO_HAVE_SUM, PASSES_IF(a + b == VALUE), EXPECTED(#VALUE))
+
+DESCRIBE(expect_m) {
+    IT("works") {
+        EXPECT_M(
+            int a = 2;
+            int b = 2;
+        ) TO_HAVE_SUM(4);
+
+        EXPECT_M(
+            int a = 10;
+            int b = 2;
+        ) TO_HAVE_SUM(12);
+    }
+}
+```
+> Unlike **EXPECT**, **EXPECT_M** doesn't set up **MATCHER_VALUE**, so it doesn't work with matchers that depend on it (e.g. built-in matchers). 
+
+For example, **EXPECT** cannot work with arrays and structs:
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+#define TO_HAVE_LENGTH(VALUE)\
+    CREATE_MATCHER_S(TO_HAVE_LENGTH, PASSES_IF(sizeof(MATCHER_VALUE)/sizeof(MATCHER_VALUE[0]) == VALUE), EXPECTED(#VALUE))
+
+DESCRIBE(arr) {
+    IT("counts") {
+        EXPECT({ 1, 2, 3, 4 }) TO_HAVE_LENGTH(4); // won't compile
+    }
+}
+```
+**EXPECT_M** solves this by allowing the array to be declared directly:
+```c
+#include "tests-new.h"
+#include "tests.h"
+
+// matcher uses provided EXPECT_M array arr
+#define TO_HAVE_LENGTH(VALUE)\
+    CREATE_MATCHER_S(TO_HAVE_LENGTH, PASSES_IF(sizeof(arr)/sizeof(arr[0]) == VALUE), EXPECTED(#VALUE))
+
+DESCRIBE(arr) {
+    IT("counts") {
+        EXPECT_M(int arr[] = { 1, 2, 3, 4 }) TO_HAVE_LENGTH(4);
+    }
+}
+```
 
 ## Test notes
  - Basically, if you have only one test file or you do not plan to use **MULTI_TEST** related features, it is not required to include [tests-new.h](https://raw.githubusercontent.com/Astroner/macros/master/tests-new.h)

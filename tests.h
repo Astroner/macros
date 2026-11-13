@@ -238,6 +238,13 @@
         TESTS_info->testText = #VALUE;\
         TESTS_info->isNot = 0;\
 
+#define EXPECT_M(...)\
+    {\
+        TESTS_info->failLine = __LINE__;\
+        TESTS_info->testText = #__VA_ARGS__;\
+        TESTS_info->isNot = 0;\
+        __VA_ARGS__;
+
 #define NOT\
     TESTS_info->isNot = 1;\
 
