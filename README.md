@@ -284,6 +284,9 @@ DESCRIBE(math) {
      - [AFTER_EACH](#after_each)
  - [Merging test suits](#merging-test-suits)
  - [Multiple test files](#multiple-test-files)
+ - [CLI Options](#cli-options)
+     - [Help](#help)
+     - [Only](#only)
  - [Creating new matchers](#creating-new-matchers)
      - [CREATE_MATCHER_S](#create_matcher_s)
      - [CREATE_MATCHER](#create_matcher)
@@ -613,6 +616,17 @@ RUN_TESTS(test1, test2)
 ```
 To run multiple test files at once, you need to define **MULTI_TEST** before including [tests.h](https://raw.githubusercontent.com/Astroner/macros/master/tests.h), then you can include different test files and at the end you can use macro **RUN_TESTS** with test identifiers to run tests.
 
+## CLI Options
+Test executable accepts the following options:
+
+### Help
+```./tests -h```
+Print help
+
+### Only
+```./tests -o ONLY```
+Run only ITs with ONLY label
+
 ## Creating new matchers
 To create new matcher the library provides **CREATE_MATCHER** and **CREATE_MATCHER_S** macros.
 Quick example
@@ -883,7 +897,10 @@ int main(void) {
 List of overrides:
 | Macro name       | Default value         | Usage                                                                                                        |
 |------------------|-----------------------|--------------------------------------------------------------------------------------------------------------|
-| TESTS_STD_PRINT  | stdio's **printf()**  | Used for logging test related info into stdout                                                               |
-| TESTS_STD_STRLEN | string's **strlen()** | Used for measuring logged string length in [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function) macro |
-| TESTS_STD_STRCMP | string's **strcmp()** | Used in **TO_BE_STRING** matcher to check strings                                                            |
-| TESTS_STD_MEMCMP | string's **memcmp()** | Used in **TO_HAVE_BYTES** matcher to check memory                                                            |
+| TESTS_STD_PRINT  | stdio.h **printf()**  | Used for logging test related info into stdout                                                               |
+| TESTS_STD_STRLEN | string.h **strlen()** | Used for measuring logged string length in [CREATE_PRINTF_LIKE_FUNCTION](#create_printf_like_function) macro |
+| TESTS_STD_STRCMP | string.h **strcmp()** | Used by **TO_BE_STRING** matcher to check strings                                                            |
+| TESTS_STD_MEMCMP | string.h **memcmp()** | Used by **TO_HAVE_BYTES** matcher to check memory                                                            |
+| TESTS_STD_GETOPT | unistd.h **getopt()** | Used for cli parsing                                                                                         |
+| TESTS_STD_OPTOPT | unistd.h **optopt**   | Used for cli parsing                                                                                         |
+| TESTS_STD_OPTARG | unistd.h **optarg**   | Used for cli parsing                                                                                         |

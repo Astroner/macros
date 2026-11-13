@@ -4,6 +4,8 @@
     #define TESTS_TYPES
     typedef void TESTS_ActionFunction(void);\
     struct TESTS_infoType {\
+        char* only;\
+        int passesOnly;\
         int spaces;\
         int failLine;\
         char* testLabel;\
@@ -50,6 +52,53 @@
     #include <string.h>
     #define TESTS_STD_MEMCMP memcmp
 #endif // TESTS_STD_MEMCMP
+
+#if !defined(TESTS_STD_GETOPT)
+    #include <unistd.h>
+    #define TESTS_STD_GETOPT getopt
+#endif // 
+
+#if !defined(TESTS_STD_OPTOPT)
+    #include <unistd.h>
+    #define TESTS_STD_OPTOPT optopt
+#endif // TESTS_STD_OPTOPT
+
+#if !defined(TESTS_STD_OPTARG)
+    #include <unistd.h>
+    #define TESTS_STD_OPTARG optarg
+#endif // TESTS_STD_OPTARG
+
+#define TESTS_PARSE_CLI(ARGC, ARGV)\
+    TESTS_STD_PRINT("\n\n");\
+    char* only = NULL;\
+    int opt;\
+    while((opt = TESTS_STD_GETOPT(ARGC, ARGV, "ho:")) != -1) {\
+        switch(opt) {\
+            case 'o':\
+                only = TESTS_STD_OPTARG;\
+                break;\
+            case 'h':\
+                TESTS_STD_PRINT(\
+                    "Option:\n"\
+                    "  -o ONLY - run only ITs with ONLY label\n"\
+                    "\n\n"\
+                );\
+                return 0;\
+            case '?':\
+                TESTS_STD_PRINT(\
+                    "\x1B[1;31m"\
+                    "Unexpected option or value -%c=%s\n"\
+                    "Use -h for help"\
+                    "\n",\
+                    TESTS_STD_OPTOPT,\
+                    TESTS_STD_OPTARG\
+                );\
+                return 1;\
+        }\
+    }\
+    if(only != NULL) {\
+        TESTS_STD_PRINT("\x1B[1;33mOnly = \"%s\"\x1B[0m\n\n", only);\
+    }
 
 #define CREATE_PRINTF_LIKE_FUNCTION(NAME, BUFFER_LENGTH)\
     char NAME##__buffer[BUFFER_LENGTH + 1] = { '\0' };\
@@ -116,27 +165,28 @@
 #if defined(WITH_DESCRIBE_MERGE)
     #if defined(MULTI_TEST)
         #define DESCRIBE_MERGE(LABEL, ...)\
-            int LABEL(int spaces) {\
-                typedef int TestSuit(int spaces);\
+            int LABEL(int spaces, char* only) {\
+                typedef int TestSuit(int spaces, char* only);\
                 TestSuit* suits[] = { __VA_ARGS__ };\
                 int status = 0;\
                 TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
                 int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
                 for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
                     if(i != 0) TESTS_STD_PRINT("\n");\
-                    if(suits[i](localSpaces) == 1) status = 1;\
+                    if(suits[i](localSpaces, only) == 1) status = 1;\
                 }\
                 return status;\
             }
     #else
         #define DESCRIBE_MERGE(LABEL, ...)\
-            int main(void) {\
-                typedef int TestSuit(int spaces);\
+            int main(int argc, char** argv) {\
+                TESTS_PARSE_CLI(argc, argv);\
+                typedef int TestSuit(int spaces, char* only);\
                 TestSuit* suits[] = { __VA_ARGS__ };\
                 int status = 0;\
                 TESTS_STD_SP_PRINT(0, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
                 for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
-                    if(suits[i](TESTS_PRINT_TAB_WIDTH) == 1) status = 1;\
+                    if(suits[i](TESTS_PRINT_TAB_WIDTH, only) == 1) status = 1;\
                     TESTS_STD_PRINT("\n");\
                 }\
                 TESTS_STD_PRINT("\n\n");\
@@ -148,10 +198,11 @@
 #if defined(MULTI_TEST) || defined(WITH_DESCRIBE_MERGE)
     #define DESCRIBE(LABEL) \
         void LABEL##__runTests(struct TESTS_infoType* TESTS_info);\
-        int LABEL(int spaces) {\
+        int LABEL(int spaces, char* only) {\
             TESTS_STD_SP_PRINT(spaces, "\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
             int localSpaces = spaces + TESTS_PRINT_TAB_WIDTH;\
             struct TESTS_infoType info = {\
+                .only = only,\
                 .status = 0,\
                 .spaces = localSpaces,\
                 __ADD_BEFORE_EACH(LABEL)\
@@ -176,9 +227,11 @@
 #else
     #define DESCRIBE(LABEL) \
         void runTests(struct TESTS_infoType* TESTS_info);\
-        int main(void) {\
-            TESTS_STD_PRINT("\n\n\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
+        int main(int argc, char** argv) {\
+            TESTS_PARSE_CLI(argc, argv);\
+            TESTS_STD_PRINT("\x1B[1;33mDescribing '"#LABEL"'\x1B[0m\n");\
             struct TESTS_infoType info = {\
+                .only = only,\
                 .status = 0,\
                 .spaces = TESTS_PRINT_TAB_WIDTH,\
                 __ADD_BEFORE_EACH(LABEL)\
@@ -204,13 +257,13 @@
 
 #if defined(MULTI_TEST)
     #define RUN_TESTS(...)\
-        int main(void) {\
-            typedef int TestSuit(int spaces);\
+        int main(int argc, char** argv) {\
+            TESTS_PARSE_CLI(argc, argv);\
+            typedef int TestSuit(int spaces, char* only);\
             TestSuit* suits[] = { __VA_ARGS__ };\
             int status = 0;\
-            TESTS_STD_PRINT("\n\n");\
             for(size_t i = 0; i < sizeof(suits) / sizeof(suits[0]); i++) {\
-                if(suits[i](0) == 1) status = 1;\
+                if(suits[i](0, only) == 1) status = 1;\
                 TESTS_STD_PRINT("\n");\
             }\
             TESTS_STD_PRINT("\n\n");\
@@ -219,16 +272,19 @@
 #endif
 
 #define IT(LABEL)\
-    if(TESTS_info->beforeEach != NULL) {\
+    TESTS_info->passesOnly = TESTS_info->only == NULL || TESTS_STD_STRCMP(TESTS_info->only, LABEL) == 0;\
+    if(TESTS_info->passesOnly && TESTS_info->beforeEach != NULL) {\
         TESTS_info->beforeEach();\
     }\
     TESTS_info->testLabel = LABEL;\
-    TESTS_STD_SP_PRINT(TESTS_info->spaces, "\x1B[1mit "LABEL"\x1B[0m\n");\
-    for(int i = 0; i < 1; i += TESTS_info->afterEach ? (TESTS_info->afterEach(), 1) : 1)
+    if(TESTS_info->passesOnly) { TESTS_STD_SP_PRINT(TESTS_info->spaces, "\x1B[1mit "LABEL"\x1B[0m\n"); }\
+    if(TESTS_info->passesOnly) for(int i = 0; i < 1; i += TESTS_info->afterEach ? (TESTS_info->afterEach(), 1) : 1)
 
 #define IT_TODO(LABEL)\
     TESTS_info->status = 0;\
-    TESTS_STD_SP_PRINT(TESTS_info->spaces, "\x1B[1;35mTODO: it "LABEL"\x1B[0m\n");
+    if(TESTS_info->only == NULL || TESTS_STD_STRCMP(TESTS_info->only, LABEL) == 0) {\
+        TESTS_STD_SP_PRINT(TESTS_info->spaces, "\x1B[1;35mTODO: it "LABEL"\x1B[0m\n");\
+    }
 
 #define MATCHER_VALUE localPassedValue
 #define EXPECT(VALUE)\
@@ -313,7 +369,7 @@
         unsigned char buffer[] = { BYTE, __VA_ARGS__ };\
         for(size_t i = 0; i < sizeof(buffer); i++) {\
             MATCHER_CONDITION(PASSES_IF(buffer[i] == MATCHER_VALUE[i])) {\
-                printf("Got bytes mismatch at position %zu. Expected: %d, Got: %d\n", i, buffer[i], MATCHER_VALUE[i]);\
+                MATCHER_INFO("Got bytes mismatch at position %zu. Expected: %d, Got: %d", i, buffer[i], MATCHER_VALUE[i]);\
                 MATCHER_FAIL("{ "#BYTE", "#__VA_ARGS__" }")\
             }\
         }\
